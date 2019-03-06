@@ -1,0 +1,18 @@
+[buildpack]
+id = "org.cloudfoundry.buildpacks.pipenv-cnb"
+name = "Pipenv Buildpack"
+version = "0.0.1"
+
+[[metadata.dependencies]]
+id = "pipenv"
+name = "Pipenv"
+sha256 = "9e84619a4d471ad8d67ff87431c22bce33175ef070742a34727bd7a48c0d051d"
+stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
+uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs3-9e84619a.tgz"
+version = "2018.11.26"
+
+[[stacks]]
+id = "org.cloudfoundry.stacks.cflinuxfs3"
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
