@@ -1,5 +1,5 @@
 [buildpack]
-id = "org.cloudfoundry.buildpacks.pipenv-cnb"
+id = "org.cloudfoundry.buildpacks.pipenv"
 name = "Pipenv Buildpack"
 version = "0.0.1"
 
