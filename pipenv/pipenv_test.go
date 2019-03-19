@@ -59,9 +59,26 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 		})
 	})
 
-	when("Contribute", func() {
-		it("installs pipenv and converts Pipfile to requirements.txt", func() {
+	when("ContributePipenv", func() {
+		it("installs pipenv", func() {
 			mockRunner.EXPECT().Run("python", f.Build.Layers.Layer(pipenv.Layer).Root, "-m", "pip", "install", "pipenv", "--find-links="+f.Build.Layers.Layer(pipenv.Layer).Root)
+			pipenvStub := filepath.Join("testdata", "stub-pipenv.tar.gz")
+			f.AddBuildPlan(pipenv.Layer, buildplan.Dependency{})
+			f.AddDependency(pipenv.Layer, pipenvStub)
+
+			contributor, _, err := pipenv.NewContributor(f.Build, mockRunner)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(contributor.ContributePipenv()).To(Succeed())
+
+			layer := f.Build.Layers.Layer("pipenv")
+			Expect(layer).To(test.HaveLayerMetadata(true, true, false))
+			Expect(filepath.Join(layer.Root, "stub-dir", "stub.txt")).To(BeARegularFile())
+		})
+	})
+
+	when("ContributeRequirementsTxt", func() {
+		it("generates a requirements.txt", func() {
 			mockRunner.EXPECT().Run("pipenv", f.Build.Application.Root, "lock", "--requirements")
 			mockRunner.EXPECT().RunWithOutput("pipenv", f.Build.Application.Root, "lock", "--requirements")
 			pipenvStub := filepath.Join("testdata", "stub-pipenv.tar.gz")
@@ -71,11 +88,8 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 			contributor, _, err := pipenv.NewContributor(f.Build, mockRunner)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(contributor.Contribute()).To(Succeed())
-
-			layer := f.Build.Layers.Layer("pipenv")
-			Expect(layer).To(test.HaveLayerMetadata(true, true, false))
-			Expect(filepath.Join(layer.Root, "stub-dir", "stub.txt")).To(BeARegularFile())
+			Expect(contributor.ContributeRequirementsTxt()).To(Succeed())
+			Expect(filepath.Join(f.Build.Application.Root, "requirements.txt")).To(BeAnExistingFile())
 		})
 	})
 

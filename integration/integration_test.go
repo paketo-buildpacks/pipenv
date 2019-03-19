@@ -103,6 +103,28 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 		})
 	})
+
+	when("rebuilding a simple pipenv app", func() {
+		it("should cache the pipenv binary but not the requirements.txt", func() {
+			pythonBPPath, pipBPPath, pipenvBPPath := getBPPaths()
+
+			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			Expect(err).NotTo(HaveOccurred())
+
+			app.SetHealthCheck("", "3s", "1s")
+			app.Env["PORT"] = "8080"
+			err = app.Start()
+			Expect(err).ToNot(HaveOccurred())
+
+			_, imgName, _, _ := app.Info()
+
+			rebuiltApp, err := dagger.PackBuildNamedImage(imgName, filepath.Join("testdata", "pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(rebuiltApp.BuildLogs()).ToNot(ContainSubstring("Downloading from https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv"))
+			Expect(rebuiltApp.Destroy()).To(Succeed())
+		})
+	})
 }
 
 func getBPPaths() (string, string, string) {

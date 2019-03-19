@@ -34,9 +34,13 @@ func runBuild(context build.Build, runner runner.Runner) (int, error) {
 	}
 
 	if willContribute {
-		if err := contributor.Contribute(); err != nil {
+		if err := contributor.ContributePipenv(); err != nil {
 			return context.Failure(103), err
 		}
+	}
+
+	if err := contributor.ContributeRequirementsTxt(); err != nil {
+		return context.Failure(104), err
 	}
 
 	return context.Success(buildplan.BuildPlan{})
