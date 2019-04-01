@@ -2,7 +2,7 @@
 [buildpack]
 id = "org.cloudfoundry.buildpacks.pipenv"
 name = "Pipenv Buildpack"
-version = "0.0.2"
+version = "0.0.3"
 
 [[metadata.dependencies]]
 id = "pipenv"
