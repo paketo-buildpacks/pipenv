@@ -1,0 +1,11 @@
+v0.0.1 Apr 01, 2019
+====================
+
+* Pipenv-cnb runs when it detects a Pipfile in the app's root dir
+
+* The buildpack requests pip-cnb in the buildplan and creates a requirements.txt
+  file from a Pipfile or Pipfile.lock
+
+* Pipenv-cnb must run after python-cnb and before pip-cnb
+
+
