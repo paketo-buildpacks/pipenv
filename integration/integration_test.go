@@ -21,7 +21,6 @@ func TestIntegration(t *testing.T) {
 func testIntegration(t *testing.T, when spec.G, it spec.S) {
 	it.Before(func() {
 		RegisterTestingT(t)
-		Expect(dagger.BuildCFLinuxFS3()).To(Succeed())
 	})
 
 	when("building a simple pipenv app without a pipfile lock", func() {
