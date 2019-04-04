@@ -19,18 +19,36 @@ func TestIntegration(t *testing.T) {
 }
 
 func testIntegration(t *testing.T, when spec.G, it spec.S) {
+	var (
+		pythonURI, pipURI, pipenvURI string
+		err                          error
+	)
 	it.Before(func() {
 		RegisterTestingT(t)
+
+		pythonURI, err = dagger.PackageLocalBuildpack("python-cnb", "/Users/pivotal/workspace/python-cnb")
+		Expect(err).ToNot(HaveOccurred())
+
+		pipURI, err = dagger.PackageLocalBuildpack("pip-cnb", "/Users/pivotal/workspace/pip-cnb")
+		Expect(err).ToNot(HaveOccurred())
+
+		pipenvURI, err = dagger.PackageBuildpack()
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	it.After(func() {
+		for _, path := range []string{pythonURI, pipURI, pipenvURI} {
+			if path != "" {
+				Expect(os.RemoveAll(path)).To(Succeed())
+			}
+		}
 	})
 
 	when("building a simple pipenv app without a pipfile lock", func() {
 		it("builds and runs", func() {
-			pythonBPPath, pipBPPath, pipenvBPPath := getBPPaths()
-
-			app, err := dagger.PackBuild(filepath.Join("testdata", "without_pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			app, err := dagger.PackBuild(filepath.Join("testdata", "without_pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
 
-			//app.SetHealthCheck("", "3s", "1s")
 			app.Env["PORT"] = "8080"
 			err = app.Start()
 			if err != nil {
@@ -42,16 +60,12 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
 
 			Expect(app.Destroy()).To(Succeed())
-
 		})
-
 	})
 
 	when("building a simple pipenv app with a pipfile lock", func() {
 		it("builds and runs", func() {
-			pythonBPPath, pipBPPath, pipenvBPPath := getBPPaths()
-
-			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
 
 			app.Env["PORT"] = "8080"
@@ -68,9 +82,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("sets python version to version in pipfile.lock", func() {
-			pythonBPPath, pipBPPath, pipenvBPPath := getBPPaths()
-
-			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
 
 			app.SetHealthCheck("", "3s", "1s")
@@ -92,9 +104,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("building a simple pipenv app with a pipfile and requirements.txt", func() {
 		it("ignores the pipfile", func() {
-			pythonBPPath, pipBPPath, pipenvBPPath := getBPPaths()
-
-			_, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_requirements"), pythonBPPath, pipenvBPPath, pipBPPath)
+			_, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_requirements"), pythonURI, pipenvURI, pipURI)
 
 			Expect(err).To(HaveOccurred())
 
@@ -105,9 +115,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("rebuilding a simple pipenv app", func() {
 		it("should cache the pipenv binary but not the requirements.txt", func() {
-			pythonBPPath, pipBPPath, pipenvBPPath := getBPPaths()
-
-			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
 
 			app.SetHealthCheck("", "3s", "1s")
@@ -117,24 +125,26 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 			_, imgName, _, _ := app.Info()
 
-			rebuiltApp, err := dagger.PackBuildNamedImage(imgName, filepath.Join("testdata", "pipfile_lock"), pythonBPPath, pipenvBPPath, pipBPPath)
+			rebuiltApp, err := dagger.PackBuildNamedImage(imgName, filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(rebuiltApp.BuildLogs()).ToNot(ContainSubstring("Downloading from https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv"))
+			Expect(rebuiltApp.BuildLogs()).To(MatchRegexp("Pipenv (\\S)+: Reusing cached layer"))
+			Expect(rebuiltApp.BuildLogs()).To(ContainSubstring("Updated Pipfile.lock"))
+			files, err := rebuiltApp.Files(filepath.Join("/workspace", "requirements.txt"))
+			Expect(err).NotTo(HaveOccurred())
+			Expect(files).To(ContainElement(ContainSubstring("requirements.txt")))
 			Expect(rebuiltApp.Destroy()).To(Succeed())
 		})
 	})
-}
 
-func getBPPaths() (string, string, string) {
-	pipenvBPPath, err := dagger.PackageBuildpack()
-	Expect(err).ToNot(HaveOccurred())
+	when("when building an app without a pipfile", func() {
+		it("should fail during detection", func() {
+			_, err := dagger.PackBuild(filepath.Join("testdata", "without_pipfile"), pythonURI, pipenvURI, pipURI)
 
-	pythonBPPath, err := dagger.GetLatestBuildpack("python-cnb")
-	Expect(err).ToNot(HaveOccurred())
+			Expect(err).To(HaveOccurred())
 
-	pipBPPath, err := dagger.GetLatestBuildpack("pip-cnb")
-	Expect(err).ToNot(HaveOccurred())
-
-	return pythonBPPath, pipBPPath, pipenvBPPath
+			Expect(err.Error()).To(ContainSubstring("Pipenv Buildpack: fail"))
+		})
+	})
 }
