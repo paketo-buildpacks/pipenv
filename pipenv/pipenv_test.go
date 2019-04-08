@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/cloudfoundry/libcfbuildpack/helper"
+
 	"github.com/golang/mock/gomock"
 
 	"github.com/buildpack/libbuildpack/buildplan"
@@ -153,6 +155,25 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 			version, err := pipenv.GetPythonVersionFromPipfileLock(tmpFile.Name())
 			Expect(err).NotTo(HaveOccurred())
 			Expect(version).To(Equal(""))
+		})
+	})
+
+	when("Generating Requirements.txt from Pipfile.lock", func() {
+		it("return contents of Requirements.txt to be saved", func() {
+			f.AddBuildPlan(pipenv.Layer, buildplan.Dependency{})
+
+			lockPath := filepath.Join(f.Build.Application.Root, "Pipfile.lock")
+			Expect(helper.CopyFile(filepath.Join("testdata", "Pipfile.lock"), lockPath)).To(Succeed())
+			defer os.Remove(lockPath)
+
+			cont, _, _ := pipenv.NewContributor(f.Build, mockRunner)
+			Expect(cont.ContributeRequirementsTxt()).To(Succeed())
+			requirementsTxtFile := filepath.Join(f.Build.Application.Root, "requirements.txt")
+			Expect(requirementsTxtFile).To(BeAnExistingFile())
+			requirementsTxtContents, err := ioutil.ReadFile(requirementsTxtFile)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(string(requirementsTxtContents)).ToNot(Equal(""))
+			Expect(string(requirementsTxtContents)).To(ContainSubstring("flask==1.0.2"))
 		})
 	})
 }

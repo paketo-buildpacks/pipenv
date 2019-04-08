@@ -1,7 +1,9 @@
 package pipenv
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path/filepath"
 
@@ -14,9 +16,10 @@ import (
 )
 
 const (
-	Layer               = "pipenv"
-	PythonLayer         = "python"
-	PythonPackagesLayer = "python_packages"
+	Layer                    = "pipenv"
+	PythonLayer              = "python"
+	PythonPackagesLayer      = "python_packages"
+	PythonPackagesCacheLayer = "python_packages_cache"
 )
 
 type PipfileLock struct {
@@ -24,7 +27,13 @@ type PipfileLock struct {
 		Requires struct {
 			Version string `json:"python_version"`
 		} `json:"requires"`
+		Sources []struct {
+			URL string
+		}
 	} `json:"_meta"`
+	Default map[string]struct {
+		Version string
+	}
 }
 
 type Contributor struct {
@@ -88,19 +97,57 @@ func (n Contributor) ContributePipenv() error {
 func (n Contributor) ContributeRequirementsTxt() error {
 	n.context.Logger.Info("Generating requirements.txt")
 
-	if err := n.runner.Run("pipenv", n.context.Application.Root, "lock", "--requirements"); err != nil {
-		return errors.Wrap(err, "problem generating initial Pipfile.lock")
-	}
-
-	// When we run this a second time, we get the output we care about without extraneous logging
-	requirements, err := n.runner.RunWithOutput("pipenv", n.context.Application.Root, "lock", "--requirements")
+	lockPath := filepath.Join(n.context.Application.Root, "Pipfile.lock")
+	present, err := helper.FileExists(lockPath)
 	if err != nil {
-		return errors.Wrap(err, "problem with reading requirements from Pipfile.lock")
+		return err
 	}
+	var requirements []byte
+	if present {
+		n.context.Logger.Info("Generating requirements.txt from Pipfile.lock")
+		requirements, err = pipfileLockToRequirementsTxt(lockPath)
+		if err != nil {
+			return errors.Wrap(err, "problem generating requirements.txt from Pipfile.lock")
+		}
+	} else {
+		if err := n.runner.Run("pipenv", n.context.Application.Root, "lock", "--requirements"); err != nil {
+			return errors.Wrap(err, "problem generating initial Pipfile.lock")
+		}
 
+		// When we run this a second time, we get the output we care about without extraneous logging
+		requirements, err = n.runner.RunWithOutput("pipenv", n.context.Application.Root, "lock", "--requirements")
+		if err != nil {
+			return errors.Wrap(err, "problem with reading requirements from Pipfile.lock")
+		}
+	}
 	if err = ioutil.WriteFile(filepath.Join(n.context.Application.Root, "requirements.txt"), requirements, 0644); err != nil {
 		return errors.Wrap(err, "problem writing requirements")
 	}
 
 	return nil
+}
+
+func pipfileLockToRequirementsTxt(pipfileLockPath string) ([]byte, error) {
+	lockContents, err := ioutil.ReadFile(pipfileLockPath)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	lockFile := PipfileLock{}
+	err = json.Unmarshal(lockContents, &lockFile)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	buf := &bytes.Buffer{}
+
+	for _, source := range lockFile.Meta.Sources {
+		fmt.Fprintf(buf, "-i %s\n", source.URL)
+	}
+
+	for pkg, obj := range lockFile.Default {
+		fmt.Fprintf(buf, "%s%s\n", pkg, obj.Version)
+	}
+
+	return buf.Bytes(), nil
 }

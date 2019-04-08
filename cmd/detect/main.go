@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -49,14 +52,16 @@ func runDetect(context detect.Detect) (int, error) {
 		return detect.FailStatusCode, nil
 	}
 
-	pipfileLockExists, err := helper.FileExists(filepath.Join(context.Application.Root, "Pipfile.lock"))
+	pipfileLockPath := filepath.Join(context.Application.Root, "Pipfile.lock")
+	pipfileLockExists, err := helper.FileExists(pipfileLockPath)
 	if err != nil {
 		return detect.FailStatusCode, errors.Wrap(err, "error checking for pipfile.lock")
 	}
 
 	pythonVersion := context.BuildPlan[pipenv.PythonLayer].Version
+	var pipLockHash interface{}
 	if pipfileLockExists {
-		pipfileVersion, err := pipenv.GetPythonVersionFromPipfileLock(filepath.Join(context.Application.Root, "Pipfile.lock"))
+		pipfileVersion, err := pipenv.GetPythonVersionFromPipfileLock(pipfileLockPath)
 		if err != nil {
 			return detect.FailStatusCode, errors.Wrap(err, "error reading python version from pipfile.lock")
 		}
@@ -64,8 +69,15 @@ func runDetect(context detect.Detect) (int, error) {
 		if pythonVersion == "" && pipfileVersion != "" {
 			pythonVersion = pipfileVersion
 		} else if pythonVersion != "" && pipfileVersion != "" && pythonVersion != pipfileVersion {
-			context.Logger.Info("There is a mismatch of your python version between either your buildpack.yml and Pipfile.lock")
+			context.Logger.Info("There is a mismatch of your python version between your buildpack.yml and Pipfile.lock")
 		}
+
+		buf, err := ioutil.ReadFile(pipfileLockPath)
+		if err != nil {
+			return detect.FailStatusCode, err
+		}
+		hash := sha256.Sum256(buf)
+		pipLockHash = hex.EncodeToString(hash[:])
 	}
 
 	return context.Pass(buildplan.BuildPlan{
@@ -76,8 +88,9 @@ func runDetect(context detect.Detect) (int, error) {
 		pipenv.Layer: buildplan.Dependency{
 			Metadata: buildplan.Metadata{"build": true},
 		},
-		pipenv.PythonPackagesLayer: buildplan.Dependency{
-			Metadata: buildplan.Metadata{"build": true, "launch": true},
+		pipenv.PythonPackagesLayer: buildplan.Dependency{},
+		pipenv.PythonPackagesCacheLayer: buildplan.Dependency{
+			Metadata: buildplan.Metadata{"cacheable": pipLockHash},
 		},
 	})
 }

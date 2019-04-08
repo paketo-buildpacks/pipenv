@@ -26,10 +26,10 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 	it.Before(func() {
 		RegisterTestingT(t)
 
-		pythonURI, err = dagger.PackageLocalBuildpack("python-cnb", "/Users/pivotal/workspace/python-cnb")
+		pythonURI, err = dagger.GetLatestBuildpack("python-cnb")
 		Expect(err).ToNot(HaveOccurred())
 
-		pipURI, err = dagger.PackageLocalBuildpack("pip-cnb", "/Users/pivotal/workspace/pip-cnb")
+		pipURI, err = dagger.GetLatestBuildpack("pip-cnb")
 		Expect(err).ToNot(HaveOccurred())
 
 		pipenvURI, err = dagger.PackageBuildpack()
@@ -130,7 +130,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 			Expect(rebuiltApp.BuildLogs()).ToNot(ContainSubstring("Downloading from https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv"))
 			Expect(rebuiltApp.BuildLogs()).To(MatchRegexp("Pipenv (\\S)+: Reusing cached layer"))
-			Expect(rebuiltApp.BuildLogs()).To(ContainSubstring("Updated Pipfile.lock"))
+			Expect(rebuiltApp.BuildLogs()).To(ContainSubstring("Generating requirements.txt from Pipfile.lock"))
 			files, err := rebuiltApp.Files(filepath.Join("/workspace", "requirements.txt"))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(files).To(ContainElement(ContainSubstring("requirements.txt")))

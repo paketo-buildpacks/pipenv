@@ -59,9 +59,11 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 					},
 				},
 				"python_packages": buildplan.Dependency{
+					Metadata: nil,
+				},
+				"python_packages_cache": buildplan.Dependency{
 					Metadata: buildplan.Metadata{
-						"build":  true,
-						"launch": true,
+						"cacheable": nil,
 					},
 				},
 			}))
@@ -75,6 +77,31 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 
 		})
 
+	})
+
+	when("there is a Pipfile.lock", func() {
+		it.Before(func() {
+			pipfileLock := `
+			{
+			 "_meta": {
+			     "requires": {
+			         "python_version": "some-python-version"
+			     }
+			 }
+			}`
+			Expect(helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "Pipfile.lock"), 0666, pipfileLock)).To(Succeed())
+			Expect(helper.WriteFile(filepath.Join(factory.Detect.Application.Root, "Pipfile"), 0666, "")).To(Succeed())
+		})
+
+		it("passes, and adds a cacheable sha to the python_packages buildplan", func() {
+			code, err := runDetect(factory.Detect)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(code).To(Equal(detect.PassStatusCode))
+			Expect(factory.Output).To(HaveKeyWithValue("python_packages_cache", buildplan.Dependency{
+				Metadata: buildplan.Metadata{
+					"cacheable": "8e9cdde2f43fd066709a5e012dee4f08fc0808cdcdbe72e0a3e71c9fb2a4abd2",
+				}}))
+		})
 	})
 
 	when("the python version in the context and Pipfile.lock match", func() {
@@ -110,7 +137,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				},
 				Version: "some-python-version",
 			}))
-			Expect(factory.Detect.Logger.String()).ToNot(ContainSubstring("There is a mismatch of your python version between either your context and Pipfile.lock"))
+			Expect(factory.Detect.Logger.String()).ToNot(ContainSubstring("There is a mismatch of your python version between your context and Pipfile.lock"))
 		})
 	})
 
@@ -155,7 +182,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 					Version: "python-version-in-context",
 				}))
 
-			Expect(buf.String()).To(ContainSubstring("There is a mismatch of your python version between either your buildpack.yml and Pipfile.lock"))
+			Expect(buf.String()).To(ContainSubstring("There is a mismatch of your python version between your buildpack.yml and Pipfile.lock"))
 		})
 	})
 
