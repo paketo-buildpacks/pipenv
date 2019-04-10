@@ -97,7 +97,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
 
-			Expect(app.BuildLogs()).To(ContainSubstring("Python 3.7.2"))
+			Expect(app.BuildLogs()).To(MatchRegexp(`Python \d+\.\d+\.\d+: Contributing to layer`))
 			Expect(app.Destroy()).To(Succeed())
 		})
 	})
