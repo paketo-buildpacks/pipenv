@@ -14,42 +14,42 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+var (
+	bpDir, pythonURI, pipURI, pipenvURI string
+)
+
 func TestIntegration(t *testing.T) {
+	var err error
+	Expect := NewWithT(t).Expect
+	bpDir, err = dagger.FindBPRoot()
+	Expect(err).NotTo(HaveOccurred())
+	pipenvURI, err = dagger.PackageBuildpack(bpDir)
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(pipenvURI)
+
+	pythonURI, err = dagger.GetLatestBuildpack("python-cnb")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(pythonURI)
+
+	pipURI, err = dagger.GetLatestBuildpack("pip-cnb")
+	Expect(err).ToNot(HaveOccurred())
+	defer os.RemoveAll(pipURI)
+
 	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
 }
 
 func testIntegration(t *testing.T, when spec.G, it spec.S) {
-	var (
-		pythonURI, pipURI, pipenvURI string
-		err                          error
-	)
+	var Expect func(interface{}, ...interface{}) GomegaAssertion
 	it.Before(func() {
-		RegisterTestingT(t)
-
-		pythonURI, err = dagger.GetLatestBuildpack("python-cnb")
-		Expect(err).ToNot(HaveOccurred())
-
-		pipURI, err = dagger.GetLatestBuildpack("pip-cnb")
-		Expect(err).ToNot(HaveOccurred())
-
-		pipenvURI, err = dagger.PackageBuildpack()
-		Expect(err).ToNot(HaveOccurred())
-	})
-
-	it.After(func() {
-		for _, path := range []string{pythonURI, pipURI, pipenvURI} {
-			if path != "" {
-				Expect(os.RemoveAll(path)).To(Succeed())
-			}
-		}
+		Expect = NewWithT(t).Expect
 	})
 
 	when("building a simple pipenv app without a pipfile lock", func() {
 		it("builds and runs", func() {
 			app, err := dagger.PackBuild(filepath.Join("testdata", "without_pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
+			defer app.Destroy()
 
-			app.Env["PORT"] = "8080"
 			err = app.Start()
 			if err != nil {
 				_, err = fmt.Fprintf(os.Stderr, "App failed to start: %v\n", err)
@@ -58,8 +58,6 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			body, _, err := app.HTTPGet("/")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
-
-			Expect(app.Destroy()).To(Succeed())
 		})
 	})
 
@@ -67,8 +65,8 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		it("builds and runs", func() {
 			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
+			defer app.Destroy()
 
-			app.Env["PORT"] = "8080"
 			err = app.Start()
 			if err != nil {
 				_, err = fmt.Fprintf(os.Stderr, "App failed to start: %v\n", err)
@@ -77,16 +75,14 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			body, _, err := app.HTTPGet("/")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
-
-			Expect(app.Destroy()).To(Succeed())
 		})
 
 		it("sets python version to version in pipfile.lock", func() {
 			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
+			defer app.Destroy()
 
 			app.SetHealthCheck("", "3s", "1s")
-			app.Env["PORT"] = "8080"
 			err = app.Start()
 			Expect(err).ToNot(HaveOccurred())
 			if err != nil {
@@ -98,7 +94,6 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
 
 			Expect(app.BuildLogs()).To(MatchRegexp(`Python \d+\.\d+\.\d+: Contributing to layer`))
-			Expect(app.Destroy()).To(Succeed())
 		})
 	})
 
@@ -117,24 +112,23 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 		it("should cache the pipenv binary but not the requirements.txt", func() {
 			app, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
+			defer app.Destroy()
 
 			app.SetHealthCheck("", "3s", "1s")
-			app.Env["PORT"] = "8080"
 			err = app.Start()
 			Expect(err).ToNot(HaveOccurred())
 
 			_, imgName, _, _ := app.Info()
 
-			rebuiltApp, err := dagger.PackBuildNamedImage(imgName, filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
+			app, err = dagger.PackBuildNamedImage(imgName, filepath.Join("testdata", "pipfile_lock"), pythonURI, pipenvURI, pipURI)
 			Expect(err).NotTo(HaveOccurred())
 
-			Expect(rebuiltApp.BuildLogs()).ToNot(ContainSubstring("Downloading from https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv"))
-			Expect(rebuiltApp.BuildLogs()).To(MatchRegexp("Pipenv (\\S)+: Reusing cached layer"))
-			Expect(rebuiltApp.BuildLogs()).To(ContainSubstring("Generating requirements.txt from Pipfile.lock"))
-			files, err := rebuiltApp.Files(filepath.Join("/workspace", "requirements.txt"))
+			Expect(app.BuildLogs()).ToNot(ContainSubstring("Downloading from https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv"))
+			Expect(app.BuildLogs()).To(MatchRegexp("Pipenv (\\S)+: Reusing cached layer"))
+			Expect(app.BuildLogs()).To(ContainSubstring("Generating requirements.txt from Pipfile.lock"))
+			files, err := app.Files(filepath.Join("/workspace", "requirements.txt"))
 			Expect(err).NotTo(HaveOccurred())
 			Expect(files).To(ContainElement(ContainSubstring("requirements.txt")))
-			Expect(rebuiltApp.Destroy()).To(Succeed())
 		})
 	})
 
