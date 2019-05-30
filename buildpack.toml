@@ -1,7 +1,8 @@
+
 [buildpack]
 id = "org.cloudfoundry.pipenv"
 name = "Pipenv Buildpack"
-version = "0.0.3"
+version = "0.0.4"
 
 [metadata]
 include_files = ["bin/build","bin/detect","buildpack.toml"]

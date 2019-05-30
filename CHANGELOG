@@ -1,3 +1,13 @@
+v0.0.4 May 30, 2019
+====================
+
+* Support libcfbuildpack packager
+
+* Cache packages based on Pipfile.lock
+  (https://www.pivotaltracker.com/story/show/164702324)
+
+* Remove bionic as a stack from buildpack.toml
+
 v0.0.3 Apr 01, 2019
 ====================
 
