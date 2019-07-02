@@ -105,6 +105,10 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 	})
 
 	when("the python version in the context and Pipfile.lock match", func() {
+		var (
+			buf = bytes.Buffer{}
+		)
+
 		it.Before(func() {
 			pipfileLock := `
 			{
@@ -128,6 +132,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("the python version should be in the buildplan and there should be no warning", func() {
+			factory.Detect.Logger = v3Logger.Logger{Logger: v2Logger.NewLogger(&buf, &buf)}
 			_, err := runDetect(factory.Detect)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(factory.Output).To(HaveKeyWithValue("python", buildplan.Dependency{
@@ -137,7 +142,7 @@ func testDetect(t *testing.T, when spec.G, it spec.S) {
 				},
 				Version: "some-python-version",
 			}))
-			Expect(factory.Detect.Logger.String()).ToNot(ContainSubstring("There is a mismatch of your python version between your context and Pipfile.lock"))
+			Expect(buf.String()).ToNot(ContainSubstring("There is a mismatch of your python version between your context and Pipfile.lock"))
 		})
 	})
 
