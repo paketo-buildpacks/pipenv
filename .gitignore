@@ -2,4 +2,3 @@
 .bin
 *.tgz
 pipenv-cnb_*
-/buildpack.toml
