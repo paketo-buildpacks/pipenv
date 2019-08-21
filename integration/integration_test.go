@@ -35,7 +35,9 @@ func TestIntegration(t *testing.T) {
 	Expect(err).ToNot(HaveOccurred())
 	defer dagger.DeleteBuildpack(pipURI)
 
-	spec.Run(t, "Integration", testIntegration, spec.Report(report.Terminal{}))
+	dagger.SyncParallelOutput(func() {
+		spec.Run(t, "Integration", testIntegration, spec.Parallel(), spec.Report(report.Terminal{}))
+	})
 }
 
 func testIntegration(t *testing.T, when spec.G, it spec.S) {
