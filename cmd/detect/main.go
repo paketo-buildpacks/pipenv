@@ -1,10 +1,7 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -23,11 +20,6 @@ func main() {
 		os.Exit(100)
 	}
 
-	if err := context.BuildPlan.Init(); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Failed to initialize Build Plan: %s\n", err)
-		os.Exit(101)
-	}
-
 	code, err := runDetect(context)
 	if err != nil {
 		context.Logger.Info(err.Error())
@@ -37,60 +29,59 @@ func main() {
 }
 
 func runDetect(context detect.Detect) (int, error) {
-	exists, err := helper.FileExists(filepath.Join(context.Application.Root, "Pipfile"))
+	exists, err := helper.FileExists(filepath.Join(context.Application.Root, pipenv.Pipfile))
 	if err != nil {
 		return detect.FailStatusCode, err
 	} else if !exists {
-		context.Logger.Info("no Pipfile found")
+		context.Logger.Info(fmt.Sprintf("no %s found", pipenv.Pipfile))
 		return detect.FailStatusCode, nil
 	}
 
-	if exists, err := helper.FileExists(filepath.Join(context.Application.Root, "requirements.txt")); err != nil {
+	if exists, err := helper.FileExists(filepath.Join(context.Application.Root, pipenv.RequirementsFile)); err != nil {
 		return detect.FailStatusCode, err
 	} else if exists {
-		context.Logger.Error("found Pipfile + requirements.txt")
+		context.Logger.Error(fmt.Sprintf("found %s + %s", pipenv.Pipfile, pipenv.RequirementsFile))
 		return detect.FailStatusCode, nil
 	}
 
-	pipfileLockPath := filepath.Join(context.Application.Root, "Pipfile.lock")
+	pipfileLockPath := filepath.Join(context.Application.Root, pipenv.LockFile)
 	pipfileLockExists, err := helper.FileExists(pipfileLockPath)
 	if err != nil {
-		return detect.FailStatusCode, errors.Wrap(err, "error checking for pipfile.lock")
+		return detect.FailStatusCode, errors.Wrap(err, "error checking for "+pipenv.LockFile)
 	}
 
-	pythonVersion := context.BuildPlan[pipenv.PythonLayer].Version
-	var pipLockHash interface{}
+	var (
+		pipfileVersion string
+		versionSource  string
+	)
+
 	if pipfileLockExists {
-		pipfileVersion, err := pipenv.GetPythonVersionFromPipfileLock(pipfileLockPath)
+		pipfileVersion, err = pipenv.GetPythonVersionFromPipfileLock(pipfileLockPath)
 		if err != nil {
-			return detect.FailStatusCode, errors.Wrap(err, "error reading python version from pipfile.lock")
+			return detect.FailStatusCode, errors.Wrapf(err, "error reading python version from %s", pipenv.LockFile)
 		}
-
-		if pythonVersion == "" && pipfileVersion != "" {
-			pythonVersion = pipfileVersion
-		} else if pythonVersion != "" && pipfileVersion != "" && pythonVersion != pipfileVersion {
-			context.Logger.Info("There is a mismatch of your python version between your buildpack.yml and Pipfile.lock")
-		}
-
-		buf, err := ioutil.ReadFile(pipfileLockPath)
-		if err != nil {
-			return detect.FailStatusCode, err
-		}
-		hash := sha256.Sum256(buf)
-		pipLockHash = hex.EncodeToString(hash[:])
+		versionSource = pipenv.LockFile
 	}
 
-	return context.Pass(buildplan.BuildPlan{
-		pipenv.PythonLayer: buildplan.Dependency{
-			Version:  pythonVersion,
-			Metadata: buildplan.Metadata{"build": true, "launch": true},
+	return context.Pass(buildplan.Plan{
+		Provides: []buildplan.Provided{
+			{
+				Name: pipenv.Dependency,
+			},
+			{
+				Name: pipenv.RequirementsLayer,
+			},
 		},
-		pipenv.Layer: buildplan.Dependency{
-			Metadata: buildplan.Metadata{"build": true},
-		},
-		pipenv.PythonPackagesLayer: buildplan.Dependency{},
-		pipenv.PythonPackagesCacheLayer: buildplan.Dependency{
-			Metadata: buildplan.Metadata{"cacheable": pipLockHash},
+		Requires: []buildplan.Required{
+			{
+				Name:     pipenv.PythonLayer,
+				Version:  pipfileVersion,
+				Metadata: buildplan.Metadata{"build": true, "version-source": versionSource},
+			},
+			{
+				Name:     pipenv.Dependency,
+				Metadata: buildplan.Metadata{"build": true},
+			},
 		},
 	})
 }

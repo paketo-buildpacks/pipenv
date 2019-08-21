@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"github.com/cloudfoundry/libcfbuildpack/helper"
+	"github.com/cloudfoundry/libcfbuildpack/logger"
 
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/layers"
@@ -16,10 +19,12 @@ import (
 )
 
 const (
-	Layer                    = "pipenv"
+	Dependency               = "pipenv"
 	PythonLayer              = "python"
-	PythonPackagesLayer      = "python_packages"
-	PythonPackagesCacheLayer = "python_packages_cache"
+	RequirementsLayer        = "requirements"
+	Pipfile                  = "Pipfile"
+	LockFile                 = "Pipfile.lock"
+	RequirementsFile         = "requirements.txt"
 )
 
 type PipfileLock struct {
@@ -37,17 +42,40 @@ type PipfileLock struct {
 }
 
 type Contributor struct {
-	context build.Build
-	runner  runner.Runner
+	requirementsMetadata logger.Identifiable
+	context              build.Build
+	runner               runner.Runner
+	pipenvLayer          layers.DependencyLayer
+	requirementsLayer    layers.Layer
+	packagesCacheLayer   layers.Layer
+	buildContribution    bool
+	launchContribution	 bool
+}
+
+type Metadata struct {
+	Name string
+	Hash string
+}
+
+func (m Metadata) Identity() (name string, version string) {
+	return m.Name, m.Hash
 }
 
 func NewContributor(context build.Build, runner runner.Runner) (Contributor, bool, error) {
-	_, willContribute := context.BuildPlan[Layer]
-	if !willContribute {
-		return Contributor{}, false, nil
+	plan, willContribute, err := context.Plans.GetShallowMerged(Dependency)
+	if err != nil || !willContribute {
+		return Contributor{}, false, err
 	}
 
-	contributor := Contributor{context: context, runner: runner}
+	contributor := Contributor{
+		context:              context,
+		runner:               runner,
+		requirementsLayer:    context.Layers.Layer(RequirementsLayer),
+		requirementsMetadata: Metadata{RequirementsLayer, strconv.FormatInt(time.Now().UnixNano(), 16)},
+	}
+
+	contributor.buildContribution, _ = plan.Metadata["build"].(bool)
+	contributor.launchContribution, _ = plan.Metadata["launch"].(bool)
 
 	return contributor, true, nil
 }
@@ -67,18 +95,18 @@ func GetPythonVersionFromPipfileLock(fullPath string) (string, error) {
 
 }
 
-func (n Contributor) ContributePipenv() error {
-	deps, err := n.context.Buildpack.Dependencies()
+func (c Contributor) ContributePipenv() error {
+	deps, err := c.context.Buildpack.Dependencies()
 	if err != nil {
 		return err
 	}
 
-	dep, err := deps.Best(Layer, "*", n.context.Stack)
+	dep, err := deps.Best(Dependency, "*", c.context.Stack)
 	if err != nil {
 		return err
 	}
 
-	layer := n.context.Layers.DependencyLayer(dep)
+	layer := c.context.Layers.DependencyLayer(dep)
 
 	return layer.Contribute(func(artifact string, layer layers.DependencyLayer) error {
 		layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
@@ -86,45 +114,54 @@ func (n Contributor) ContributePipenv() error {
 			return errors.Wrap(err, "problem extracting")
 		}
 
-		if err := n.runner.Run("python", layer.Root, "-m", "pip", "install", "pipenv", "--find-links="+layer.Root); err != nil {
+		if err := c.runner.Run("python", layer.Root, "-m", "pip", "install", "pipenv", "--find-links="+layer.Root); err != nil {
 			return errors.Wrap(err, "problem installing pipenv")
 		}
 
 		return nil
-	}, layers.Build, layers.Cache)
+	}, c.flags()...)
 }
 
-func (n Contributor) ContributeRequirementsTxt() error {
-	n.context.Logger.Info("Generating requirements.txt")
+func (c Contributor) ContributeRequirementsTxt() error {
+	c.context.Logger.Info("Generating requirements.txt")
 
-	lockPath := filepath.Join(n.context.Application.Root, "Pipfile.lock")
-	present, err := helper.FileExists(lockPath)
+	lockPath := filepath.Join(c.context.Application.Root, LockFile)
+	hasLockFile, err := helper.FileExists(lockPath)
 	if err != nil {
 		return err
 	}
-	var requirements []byte
-	if present {
-		n.context.Logger.Info("Generating requirements.txt from Pipfile.lock")
-		requirements, err = pipfileLockToRequirementsTxt(lockPath)
+
+	var requirementsContent []byte
+	if hasLockFile {
+		c.context.Logger.Info(fmt.Sprintf("Generating %s from %s", RequirementsFile, LockFile))
+		requirementsContent, err = pipfileLockToRequirementsTxt(lockPath)
 		if err != nil {
-			return errors.Wrap(err, "problem generating requirements.txt from Pipfile.lock")
+			return errors.Wrapf(err, "problem generating %s from %s", RequirementsFile, LockFile)
 		}
 	} else {
-		if err := n.runner.Run("pipenv", n.context.Application.Root, "lock", "--requirements"); err != nil {
+		if err := c.runner.Run("pipenv", c.context.Application.Root, "lock", "--requirements"); err != nil {
 			return errors.Wrap(err, "problem generating initial Pipfile.lock")
 		}
 
 		// When we run this a second time, we get the output we care about without extraneous logging
-		requirements, err = n.runner.RunWithOutput("pipenv", n.context.Application.Root, "lock", "--requirements")
+		requirementsContent, err = c.runner.RunWithOutput("pipenv", c.context.Application.Root, "lock", "--requirements")
 		if err != nil {
-			return errors.Wrap(err, "problem with reading requirements from Pipfile.lock")
+			return errors.Wrapf(err, "problem with reading requirements from %s", LockFile)
 		}
 	}
-	if err = ioutil.WriteFile(filepath.Join(n.context.Application.Root, "requirements.txt"), requirements, 0644); err != nil {
-		return errors.Wrap(err, "problem writing requirements")
-	}
 
-	return nil
+	return c.requirementsLayer.Contribute(c.requirementsMetadata, func(layer layers.Layer) error {
+		layer.Touch()
+		layer.Logger.SubsequentLine("Writing %s to %s", RequirementsFile, layer.Root)
+		requirementsPath := filepath.Join(layer.Root, RequirementsFile)
+
+
+		if err = helper.WriteFile(requirementsPath, 0644, "%s", requirementsContent); err != nil {
+			return errors.Wrap(err, "problem writing requirements")
+		}
+
+		return helper.CopyFile(requirementsPath, filepath.Join(c.context.Application.Root, RequirementsFile))
+	})
 }
 
 func pipfileLockToRequirementsTxt(pipfileLockPath string) ([]byte, error) {
@@ -150,4 +187,17 @@ func pipfileLockToRequirementsTxt(pipfileLockPath string) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+func (c Contributor) flags() []layers.Flag {
+	flags := []layers.Flag{layers.Cache}
+
+	if c.buildContribution {
+		flags = append(flags, layers.Build)
+	}
+
+	if c.launchContribution {
+		flags = append(flags, layers.Launch)
+	}
+	return flags
 }

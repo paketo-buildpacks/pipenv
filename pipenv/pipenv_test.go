@@ -11,9 +11,9 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/pipenv-cnb/pipenv"
 
+	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/test"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
@@ -52,7 +52,10 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 		})
 
 		it("does contribute when pipenv is in the buildplan", func() {
-			f.AddBuildPlan(pipenv.Layer, buildplan.Dependency{})
+			f.AddPlan(buildpackplan.Plan{
+				Name:     pipenv.Dependency,
+				Metadata: buildpackplan.Metadata{"build": true},
+			})
 
 			_, willContribute, err := pipenv.NewContributor(f.Build, mockRunner)
 
@@ -63,10 +66,14 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 
 	when("ContributePipenv", func() {
 		it("installs pipenv", func() {
-			mockRunner.EXPECT().Run("python", f.Build.Layers.Layer(pipenv.Layer).Root, "-m", "pip", "install", "pipenv", "--find-links="+f.Build.Layers.Layer(pipenv.Layer).Root)
+			mockRunner.EXPECT().Run("python", f.Build.Layers.Layer(pipenv.Dependency).Root, "-m", "pip", "install", "pipenv", "--find-links="+f.Build.Layers.Layer(pipenv.Dependency).Root)
 			pipenvStub := filepath.Join("testdata", "stub-pipenv.tar.gz")
-			f.AddBuildPlan(pipenv.Layer, buildplan.Dependency{})
-			f.AddDependency(pipenv.Layer, pipenvStub)
+
+			f.AddPlan(buildpackplan.Plan{
+				Name:     pipenv.Dependency,
+				Metadata: buildpackplan.Metadata{"build": true},
+			})
+			f.AddDependency(pipenv.Dependency, pipenvStub)
 
 			contributor, _, err := pipenv.NewContributor(f.Build, mockRunner)
 
@@ -84,8 +91,11 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 			mockRunner.EXPECT().Run("pipenv", f.Build.Application.Root, "lock", "--requirements")
 			mockRunner.EXPECT().RunWithOutput("pipenv", f.Build.Application.Root, "lock", "--requirements")
 			pipenvStub := filepath.Join("testdata", "stub-pipenv.tar.gz")
-			f.AddBuildPlan(pipenv.Layer, buildplan.Dependency{})
-			f.AddDependency(pipenv.Layer, pipenvStub)
+			f.AddPlan(buildpackplan.Plan{
+				Name:     pipenv.Dependency,
+				Metadata: buildpackplan.Metadata{"build": true},
+			})
+			f.AddDependency(pipenv.Dependency, pipenvStub)
 
 			contributor, _, err := pipenv.NewContributor(f.Build, mockRunner)
 
@@ -160,7 +170,10 @@ func testPipenv(t *testing.T, when spec.G, it spec.S) {
 
 	when("Generating Requirements.txt from Pipfile.lock", func() {
 		it("return contents of Requirements.txt to be saved", func() {
-			f.AddBuildPlan(pipenv.Layer, buildplan.Dependency{})
+			f.AddPlan(buildpackplan.Plan{
+				Name:     pipenv.Dependency,
+				Metadata: buildpackplan.Metadata{"build": true},
+			})
 
 			lockPath := filepath.Join(f.Build.Application.Root, "Pipfile.lock")
 			Expect(helper.CopyFile(filepath.Join("testdata", "Pipfile.lock"), lockPath)).To(Succeed())
