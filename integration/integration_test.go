@@ -27,7 +27,7 @@ func TestIntegration(t *testing.T) {
 	Expect(err).ToNot(HaveOccurred())
 	defer dagger.DeleteBuildpack(pipenvURI)
 
-	pythonURI, err = dagger.GetLatestBuildpack("python-cnb")
+	pythonURI, err = dagger.GetLatestBuildpack("python-runtime-cnb")
 	Expect(err).ToNot(HaveOccurred())
 	defer dagger.DeleteBuildpack(pythonURI)
 
