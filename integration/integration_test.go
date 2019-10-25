@@ -101,10 +101,17 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("building a simple pipenv app with a pipfile and requirements.txt", func() {
 		it("ignores the pipfile", func() {
-			_, err := dagger.PackBuild(filepath.Join("testdata", "pipfile_requirements"), pythonURI, pipenvURI, pipURI)
+
+			pack := dagger.NewPack(
+				filepath.Join("testdata", "pipfile_requirements"),
+				dagger.RandomImage(),
+				dagger.SetBuildpacks(pythonURI, pipenvURI, pipURI),
+				dagger.SetVerbose(),
+			)
+
+			_, err := pack.Build()
 
 			Expect(err).To(HaveOccurred())
-
 			Expect(err.Error()).To(ContainSubstring("found Pipfile + requirements.txt"))
 
 		})
@@ -136,10 +143,15 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 
 	when("when building an app without a pipfile", func() {
 		it("should fail during detection", func() {
-			_, err := dagger.PackBuild(filepath.Join("testdata", "without_pipfile"), pythonURI, pipenvURI, pipURI)
+			pack := dagger.NewPack(
+				filepath.Join("testdata", "without_pipfile"),
+				dagger.RandomImage(),
+				dagger.SetBuildpacks(pythonURI, pipenvURI, pipURI),
+				dagger.SetVerbose(),
+			)
 
+			_, err := pack.Build()
 			Expect(err).To(HaveOccurred())
-
 			Expect(err.Error()).To(ContainSubstring("no Pipfile found"))
 		})
 	})

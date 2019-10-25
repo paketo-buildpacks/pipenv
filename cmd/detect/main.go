@@ -41,7 +41,7 @@ func runDetect(context detect.Detect) (int, error) {
 		return detect.FailStatusCode, err
 	} else if exists {
 		context.Logger.Error(fmt.Sprintf("found %s + %s", pipenv.Pipfile, pipenv.RequirementsFile))
-		return detect.FailStatusCode, nil
+		return detect.FailStatusCode, fmt.Errorf("found %s + %s", pipenv.Pipfile, pipenv.RequirementsFile)
 	}
 
 	pipfileLockPath := filepath.Join(context.Application.Root, pipenv.LockFile)
