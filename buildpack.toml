@@ -1,23 +1,23 @@
 api = "0.2"
 
 [buildpack]
-id = "org.cloudfoundry.pipenv"
-name = "Pipenv Buildpack"
-version = "{{ .Version }}"
+  id = "org.cloudfoundry.pipenv"
+  name = "Pipenv Buildpack"
+  version = "{{ .Version }}"
 
 [metadata]
-include_files = ["bin/build","bin/detect","buildpack.toml"]
-pre_package = "./scripts/build.sh"
+  include_files = ["bin/build", "bin/detect", "buildpack.toml"]
+  pre_package = "./scripts/build.sh"
 
-[[metadata.dependencies]]
-id = "pipenv"
-name = "Pipenv"
-sha256 = "df1da6e65a2db0f6f6ab5637027d9805c69e7f641265ece4fad0950f8cdcc83c"
-source = "https://files.pythonhosted.org/packages/fd/e9/01822318551caa0d62a181ba3b10f0f3757bb1e270da97165bd52db92776/pipenv-2018.11.26.tar.gz"
-source_sha256 = "a673e606e8452185e9817a987572b55360f4d28b50831ef3b42ac3cab3fee846"
-stacks = ["org.cloudfoundry.stacks.cflinuxfs3"]
-uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs3-df1da6e6.tgz"
-version = "2018.11.26"
+  [[metadata.dependencies]]
+    id = "pipenv"
+    name = "Pipenv"
+    sha256 = "df1da6e65a2db0f6f6ab5637027d9805c69e7f641265ece4fad0950f8cdcc83c"
+    source = "https://files.pythonhosted.org/packages/fd/e9/01822318551caa0d62a181ba3b10f0f3757bb1e270da97165bd52db92776/pipenv-2018.11.26.tar.gz"
+    source_sha256 = "a673e606e8452185e9817a987572b55360f4d28b50831ef3b42ac3cab3fee846"
+    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv-v2018.11.26-cflinuxfs3-df1da6e6.tgz"
+    version = "2018.11.26"
 
 [[stacks]]
-id = "org.cloudfoundry.stacks.cflinuxfs3"
+  id = "org.cloudfoundry.stacks.cflinuxfs3"
