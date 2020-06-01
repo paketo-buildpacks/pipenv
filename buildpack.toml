@@ -20,4 +20,7 @@ api = "0.2"
     version = "2018.11.26"
 
 [[stacks]]
+  id = "io.buildpacks.stacks.bionic"
+
+[[stacks]]
   id = "org.cloudfoundry.stacks.cflinuxfs3"
