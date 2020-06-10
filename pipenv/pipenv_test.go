@@ -11,7 +11,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 
-	"github.com/cloudfoundry/pipenv-cnb/pipenv"
+	"github.com/paketo-community/pipenv/pipenv"
 
 	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/test"

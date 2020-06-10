@@ -10,7 +10,7 @@ import (
 	"github.com/buildpack/libbuildpack/buildplan"
 	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
-	"github.com/cloudfoundry/pipenv-cnb/pipenv"
+	"github.com/paketo-community/pipenv/pipenv"
 )
 
 func main() {

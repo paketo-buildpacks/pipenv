@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/runner"
-	"github.com/cloudfoundry/pipenv-cnb/pipenv"
+	"github.com/paketo-community/pipenv/pipenv"
 )
 
 func main() {
