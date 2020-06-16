@@ -27,11 +27,11 @@ func TestIntegration(t *testing.T) {
 	Expect(err).ToNot(HaveOccurred())
 	defer dagger.DeleteBuildpack(pipenvURI)
 
-	pythonURI, err = dagger.GetLatestBuildpack("python-runtime-cnb")
+	pythonURI, err = dagger.GetLatestCommunityBuildpack("paketo-community", "python-runtime")
 	Expect(err).ToNot(HaveOccurred())
 	defer dagger.DeleteBuildpack(pythonURI)
 
-	pipURI, err = dagger.GetLatestBuildpack("pip-cnb")
+	pipURI, err = dagger.GetLatestCommunityBuildpack("paketo-community", "pip")
 	Expect(err).ToNot(HaveOccurred())
 	defer dagger.DeleteBuildpack(pipURI)
 
@@ -95,7 +95,7 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
 
-			Expect(app.BuildLogs()).To(MatchRegexp(`Python \d+\.\d+\.\d+: Contributing to layer`))
+			Expect(app.BuildLogs()).To(MatchRegexp(`Installing Python \d+\.\d+\.\d+`))
 		})
 	})
 
