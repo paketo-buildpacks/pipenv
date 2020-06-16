@@ -1,9 +1,9 @@
 api = "0.2"
 
 [buildpack]
-  id = "org.cloudfoundry.pipenv"
-  name = "Pipenv Buildpack"
-  version = "{{ .Version }}"
+id = "paketo-community/pipenv"
+name = "Pipenv Buildpack"
+version = "{{ .Version }}"
 
 [metadata]
   include_files = ["bin/build", "bin/detect", "buildpack.toml"]

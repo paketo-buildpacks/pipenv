@@ -9,7 +9,7 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/detect"
 	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/test"
-	"github.com/cloudfoundry/pipenv-cnb/pipenv"
+	"github.com/paketo-community/pipenv/pipenv"
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
 	"github.com/sclevine/spec/report"
