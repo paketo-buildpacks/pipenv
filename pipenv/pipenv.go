@@ -9,22 +9,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/cloudfoundry/libcfbuildpack/helper"
-	"github.com/cloudfoundry/libcfbuildpack/logger"
-
 	"github.com/cloudfoundry/libcfbuildpack/build"
+	"github.com/cloudfoundry/libcfbuildpack/helper"
 	"github.com/cloudfoundry/libcfbuildpack/layers"
+	"github.com/cloudfoundry/libcfbuildpack/logger"
 	"github.com/cloudfoundry/libcfbuildpack/runner"
 	"github.com/pkg/errors"
 )
 
 const (
-	Dependency               = "pipenv"
-	PythonLayer              = "python"
-	RequirementsLayer        = "requirements"
-	Pipfile                  = "Pipfile"
-	LockFile                 = "Pipfile.lock"
-	RequirementsFile         = "requirements.txt"
+	Dependency        = "pipenv"
+	PythonLayer       = "python"
+	RequirementsLayer = "requirements"
+	Pipfile           = "Pipfile"
+	LockFile          = "Pipfile.lock"
+	RequirementsFile  = "requirements.txt"
 )
 
 type PipfileLock struct {
@@ -45,11 +44,9 @@ type Contributor struct {
 	requirementsMetadata logger.Identifiable
 	context              build.Build
 	runner               runner.Runner
-	pipenvLayer          layers.DependencyLayer
 	requirementsLayer    layers.Layer
-	packagesCacheLayer   layers.Layer
 	buildContribution    bool
-	launchContribution	 bool
+	launchContribution   bool
 }
 
 type Metadata struct {
@@ -109,7 +106,7 @@ func (c Contributor) ContributePipenv() error {
 	layer := c.context.Layers.DependencyLayer(dep)
 
 	return layer.Contribute(func(artifact string, layer layers.DependencyLayer) error {
-		layer.Logger.SubsequentLine("Expanding to %s", layer.Root)
+		layer.Logger.Body("Expanding to %s", layer.Root)
 		if err := helper.ExtractTarGz(artifact, layer.Root, 0); err != nil {
 			return errors.Wrap(err, "problem extracting")
 		}
@@ -152,9 +149,8 @@ func (c Contributor) ContributeRequirementsTxt() error {
 
 	return c.requirementsLayer.Contribute(c.requirementsMetadata, func(layer layers.Layer) error {
 		layer.Touch()
-		layer.Logger.SubsequentLine("Writing %s to %s", RequirementsFile, layer.Root)
+		layer.Logger.Body("Writing %s to %s", RequirementsFile, layer.Root)
 		requirementsPath := filepath.Join(layer.Root, RequirementsFile)
-
 
 		if err = helper.WriteFile(requirementsPath, 0644, "%s", requirementsContent); err != nil {
 			return errors.Wrap(err, "problem writing requirements")
