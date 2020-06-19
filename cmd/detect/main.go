@@ -40,7 +40,7 @@ func runDetect(context detect.Detect) (int, error) {
 	if exists, err := helper.FileExists(filepath.Join(context.Application.Root, pipenv.RequirementsFile)); err != nil {
 		return detect.FailStatusCode, err
 	} else if exists {
-		context.Logger.Error(fmt.Sprintf("found %s + %s", pipenv.Pipfile, pipenv.RequirementsFile))
+		context.Logger.BodyError(fmt.Sprintf("found %s + %s", pipenv.Pipfile, pipenv.RequirementsFile))
 		return detect.FailStatusCode, fmt.Errorf("found %s + %s", pipenv.Pipfile, pipenv.RequirementsFile)
 	}
 
