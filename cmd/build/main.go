@@ -7,7 +7,7 @@ import (
 	"github.com/cloudfoundry/libcfbuildpack/build"
 	"github.com/cloudfoundry/libcfbuildpack/buildpackplan"
 	"github.com/cloudfoundry/libcfbuildpack/runner"
-	"github.com/cloudfoundry/pipenv-cnb/pipenv"
+	"github.com/paketo-community/pipenv/pipenv"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 }
 
 func runBuild(context build.Build, runner runner.Runner) (int, error) {
-	context.Logger.FirstLine(context.Logger.PrettyIdentity(context.Buildpack))
+	context.Logger.Title(context.Buildpack)
 
 	contributor, willContribute, err := pipenv.NewContributor(context, runner)
 	if err != nil {
