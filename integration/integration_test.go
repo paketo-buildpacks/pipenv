@@ -167,10 +167,6 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			Expect(app.BuildLogs()).ToNot(ContainSubstring("Downloading from https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv"))
 			Expect(app.BuildLogs()).To(MatchRegexp("Pipenv \\d+\\.\\d+\\.\\d+: Reusing cached layer"))
 			Expect(app.BuildLogs()).To(ContainSubstring("Generating requirements.txt from Pipfile.lock"))
-
-			files, err := app.Files(filepath.Join("/workspace", "requirements.txt"))
-			Expect(err).NotTo(HaveOccurred())
-			Expect(files).To(ContainElement(ContainSubstring("requirements.txt")))
 		})
 	})
 
