@@ -12,22 +12,22 @@ api = "0.2"
   [[metadata.dependencies]]
     id = "pipenv"
     name = "Pipenv"
-    sha256 = "366a8d494065ae720f46fc2489e36db11c3c60b5cf68dcfb772c87ab4df5b796"
-    source = "https://files.pythonhosted.org/packages/cc/0a/ed147c6bb2245ac9b275ef28db37b338181f1afe696317e0372786b57107/pipenv-2020.8.13.tar.gz"
-    source_sha256 = "eff0e10eadb330f612edfa5051d3d8e775e9e0e918c3c50361da703bd0daa035"
-    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.8.13_linux_noarch_cflinuxfs3_366a8d49.tgz"
-    version = "2020.8.13"
-
-  [[metadata.dependencies]]
-    id = "pipenv"
-    name = "Pipenv"
     sha256 = "ca495250f24378a7a783e3e8ddac40d87aaec4f9b06ba660ca29ee81939da54c"
     source = "https://files.pythonhosted.org/packages/20/4c/3903aff6c34e406e4a97b52170978df09332c740e9e98c6fe8ee61c4826b/pipenv-2020.11.4.tar.gz"
     source_sha256 = "d6ac39d1721517b23aca12cdb4c726dc318ec4d7bdede5c1220bbb81775005c3"
     stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.11.4_linux_noarch_cflinuxfs3_ca495250.tgz"
     version = "2020.11.4"
+
+  [[metadata.dependencies]]
+    id = "pipenv"
+    name = "Pipenv"
+    sha256 = "367981ce4d8591172996bb1ddfe860c437f38adb25ff78d55757ba1f1fc5d0a4"
+    source = "https://files.pythonhosted.org/packages/76/70/3a3fdf4549cff4e9969b2db4ea924c340969b586bf441967ab9c7d90eb52/pipenv-2020.11.15.tar.gz"
+    source_sha256 = "8253fe6f9cfb3791a54da8a0571f73c918cb3457dd908684c1800a13a06ec4c1"
+    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.11.15_linux_noarch_cflinuxfs3_367981ce.tgz"
+    version = "2020.11.15"
 
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
