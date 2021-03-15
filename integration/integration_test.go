@@ -131,8 +131,6 @@ func testIntegration(t *testing.T, when spec.G, it spec.S) {
 			body, _, err := app.HTTPGet("/")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(body).To(ContainSubstring("Hello, World with pipenv!"))
-
-			Expect(app.BuildLogs()).To(MatchRegexp(`Installing Python \d+\.\d+\.\d+`))
 		})
 	})
 
