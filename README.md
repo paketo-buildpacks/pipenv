@@ -4,7 +4,7 @@ The Paketo Pipenv Buildpack is a Cloud Native Buildpack that installs
 on the `PATH`.
 
 The buildpack is published for consumption at `gcr.io/paketo-community/pipenv`
-and `paketocommunity/pipevn`.
+and `paketocommunity/pipenv`.
 
 ## Behavior
 This buildpack always participates.
