@@ -1,4 +1,4 @@
-# Restructure Pipenv Buildpack 
+# Restructure Pipenv Buildpack
 
 ## Proposal
 
@@ -23,9 +23,7 @@ provides: `pipenv` requires: `cpython` and `pip` during build
 
 ### Detection
 
-The buildpack will pass detection if a Pipfile exists in the app directory. If
-a Pipfile.lock is present, check for a Python version and add it to the
-requirements.
+The buildpack will always pass detection.
 
 ### Configuration
 
@@ -43,9 +41,10 @@ Using the pip installation from the preceding `pip` buildpack, the buildpack
 downloads the selected Pipenv dependency and extracts it into a temporary
 directory (`path/to/pipenv/dependency`).
 
-`PYTHONUSERBASE=<path/to/pipenv/layer/> pip install <path/to/pipenv/dependency>
---user` is run to install the requested version. Setting the `PYTHONUSERBASE`
-variable ensures that pipenv is installed to the newly created layer.
+`PYTHONUSERBASE=<path/to/pipenv/layer/> pip install pipenv --user
+--find-links=<path/to/pipenv/dependency>` is run to install the requested
+version.
+Setting the `PYTHONUSERBASE` variable ensures that pipenv is installed to the newly created layer.
 
 Once the installation is complete, the buildpack prepends the
 `layers/<pipenv-layer>/lib/python/site-packages` to the `PYTHONPATH`
