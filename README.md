@@ -1,4 +1,26 @@
 # Pipenv Cloud Native Buildpack
+The Paketo Pipenv Buildpack is a Cloud Native Buildpack that installs
+[pipenv](https://pypi.org/project/pipenv) into a layer and makes it available
+on the `PATH`.
+
+The buildpack is published for consumption at `gcr.io/paketo-community/pipenv`
+and `paketocommunity/pipenv`.
+
+## Behavior
+This buildpack always participates.
+
+The buildpack will do the following:
+* At build time:
+  - Contributes the `pipenv` binary to a layer
+  - Prepends the `pipenv` layer to the `PYTHONPATH`
+  - Adds the newly installed pipenv location to `PATH`
+* At run time:
+  - Does nothing
+
+## Configuration
+| Environment Variable | Description
+| -------------------- | -----------
+| `$BP_PIPENV_VERSION` | Configure the version of pipenv to install. Buildpack releases (and the pipenv versions for each release) can be found [here](https://github.com/paketo-community/pipenv/releases).
 
 ## Integration
 
@@ -43,6 +65,12 @@ file that looks like the following:
 
 To package this buildpack for consumption:
 ```
-$ ./scripts/package.sh
+$ ./scripts/package.sh --version x.x.x
 ```
-This builds the buildpack's Go source using GOOS=linux by default. You can supply another value as the first argument to package.sh.
+This will create a `buildpackage.cnb` file under the build directory which you
+can use to build your app as follows: `pack build <app-name> -p <path-to-app> -b <cpython-buildpack> -b <pip-buildpack> -b build/buildpackage.cnb -b <some-pipenv-consumer-buildpack>`.
+
+To run the unit and integration tests for this buildpack:
+```
+$ ./scripts/unit.sh && ./scripts/integration.sh
+```
