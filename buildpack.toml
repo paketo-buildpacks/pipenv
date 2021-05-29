@@ -5,18 +5,8 @@ api = "0.5"
   name = "Paketo Pipenv Buildpack"
 
 [metadata]
-  include-files = ["bin/run","bin/build", "bin/detect", "buildpack.toml"]
+  include-files = ["bin/run", "bin/build", "bin/detect", "buildpack.toml"]
   pre-package = "./scripts/build.sh"
-
-  [[metadata.dependencies]]
-    id = "pipenv"
-    name = "Pipenv"
-    sha256 = "ca495250f24378a7a783e3e8ddac40d87aaec4f9b06ba660ca29ee81939da54c"
-    source = "https://files.pythonhosted.org/packages/20/4c/3903aff6c34e406e4a97b52170978df09332c740e9e98c6fe8ee61c4826b/pipenv-2020.11.4.tar.gz"
-    source_sha256 = "d6ac39d1721517b23aca12cdb4c726dc318ec4d7bdede5c1220bbb81775005c3"
-    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.11.4_linux_noarch_cflinuxfs3_ca495250.tgz"
-    version = "2020.11.4"
 
   [[metadata.dependencies]]
     id = "pipenv"
@@ -27,6 +17,16 @@ api = "0.5"
     stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
     uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.11.15_linux_noarch_cflinuxfs3_367981ce.tgz"
     version = "2020.11.15"
+
+  [[metadata.dependencies]]
+    id = "pipenv"
+    name = "Pipenv"
+    sha256 = "b26dc44ff904c0f23819fae156c6d3dfbbeaf3888f57022a9ebe14936b71c694"
+    source = "https://files.pythonhosted.org/packages/be/c5/a7c300c4589e898db8cfcf26f7065c24e2f5abacaea196a7f80e6695344d/pipenv-2021.5.29.tar.gz"
+    source_sha256 = "05958fadcd70b2de6a27542fcd2bd72dd5c59c6d35307fdac3e06361fb06e30e"
+    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
+    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2021.5.29_linux_noarch_cflinuxfs3_b26dc44f.tgz"
+    version = "2021.5.29"
 
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
