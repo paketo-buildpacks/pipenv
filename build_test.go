@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/paketo-buildpacks/packit/chronos"
-	"github.com/paketo-buildpacks/packit/scribe"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/paketo-buildpacks/packit/chronos"
+	"github.com/paketo-buildpacks/packit/scribe"
 
 	"github.com/paketo-buildpacks/packit"
 	"github.com/paketo-buildpacks/packit/postal"
@@ -83,12 +84,13 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
 			{
 				Name: "pipenv",
-				Metadata: map[string]interface{}{
-					"version": "pipenv-dependency-version",
-					"name":    "pipenv-dependency-name",
-					"sha256":  "pipenv-dependency-sha",
-					"stacks":  []string{"some-stack"},
-					"uri":     "pipenv-dependency-uri",
+				Metadata: packit.BOMMetadata{
+					Checksum: packit.BOMChecksum{
+						Algorithm: packit.SHA256,
+						Hash:      "pipenv-dependency-sha",
+					},
+					URI:     "pipenv-dependency-uri",
+					Version: "pipenv-dependency-version",
 				},
 			},
 		}
