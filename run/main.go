@@ -10,7 +10,7 @@ import (
 	"github.com/paketo-buildpacks/packit/pexec"
 	"github.com/paketo-buildpacks/packit/postal"
 	"github.com/paketo-buildpacks/packit/scribe"
-	"github.com/paketo-community/pipenv"
+	"github.com/paketo-buildpacks/pipenv"
 )
 
 func main() {

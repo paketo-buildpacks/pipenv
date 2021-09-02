@@ -1,4 +1,4 @@
-module github.com/paketo-community/pipenv
+module github.com/paketo-buildpacks/pipenv
 
 go 1.16
 
