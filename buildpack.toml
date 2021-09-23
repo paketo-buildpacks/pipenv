@@ -10,23 +10,32 @@ api = "0.5"
 
   [[metadata.dependencies]]
     id = "pipenv"
+    licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
-    sha256 = "367981ce4d8591172996bb1ddfe860c437f38adb25ff78d55757ba1f1fc5d0a4"
+    purl = "pkg:generic/pipenv@2020.11.15?checksum=8253fe6f9cfb3791a54da8a0571f73c918cb3457dd908684c1800a13a06ec4c1&download_url=https://files.pythonhosted.org/packages/76/70/3a3fdf4549cff4e9969b2db4ea924c340969b586bf441967ab9c7d90eb52/pipenv-2020.11.15.tar.gz"
+    sha256 = "e60db4162b2df02743a349d07934b3c0c65bb0c6042439b79b31ee5ac923ee47"
     source = "https://files.pythonhosted.org/packages/76/70/3a3fdf4549cff4e9969b2db4ea924c340969b586bf441967ab9c7d90eb52/pipenv-2020.11.15.tar.gz"
     source_sha256 = "8253fe6f9cfb3791a54da8a0571f73c918cb3457dd908684c1800a13a06ec4c1"
-    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2020.11.15_linux_noarch_cflinuxfs3_367981ce.tgz"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://deps.paketo.io/pipenv/pipenv_2020.11.15_linux_noarch_bionic_e60db416.tgz"
     version = "2020.11.15"
 
   [[metadata.dependencies]]
     id = "pipenv"
+    licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
-    sha256 = "b26dc44ff904c0f23819fae156c6d3dfbbeaf3888f57022a9ebe14936b71c694"
+    purl = "pkg:generic/pipenv@2021.5.29?checksum=05958fadcd70b2de6a27542fcd2bd72dd5c59c6d35307fdac3e06361fb06e30e&download_url=https://files.pythonhosted.org/packages/be/c5/a7c300c4589e898db8cfcf26f7065c24e2f5abacaea196a7f80e6695344d/pipenv-2021.5.29.tar.gz"
+    sha256 = "1a1e4325526ec67f77d920dbfb46a8ceb3c4af1dbf30c9730d96d8347b281b3e"
     source = "https://files.pythonhosted.org/packages/be/c5/a7c300c4589e898db8cfcf26f7065c24e2f5abacaea196a7f80e6695344d/pipenv-2021.5.29.tar.gz"
     source_sha256 = "05958fadcd70b2de6a27542fcd2bd72dd5c59c6d35307fdac3e06361fb06e30e"
-    stacks = ["io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3"]
-    uri = "https://buildpacks.cloudfoundry.org/dependencies/pipenv/pipenv_2021.5.29_linux_noarch_cflinuxfs3_b26dc44f.tgz"
+    stacks = ["io.buildpacks.stacks.bionic"]
+    uri = "https://deps.paketo.io/pipenv/pipenv_2021.5.29_linux_noarch_bionic_1a1e4325.tgz"
     version = "2021.5.29"
+
+  [[metadata.dependency-constraints]]
+    constraint = "*"
+    id = "pipenv"
+    patches = 2
 
 [[stacks]]
   id = "io.buildpacks.stacks.bionic"
