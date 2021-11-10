@@ -2,7 +2,7 @@ package pipenv
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -74,7 +74,18 @@ func Build(
 
 		logs.SelectedDependency(entry, dependency, clock.Now())
 
-		boms := dependencyManager.GenerateBillOfMaterials(dependency)
+		bom := dependencyManager.GenerateBillOfMaterials(dependency)
+		launch, build := entryResolver.MergeLayerTypes(Pipenv, context.Plan.Entries)
+
+		var launchMetadata packit.LaunchMetadata
+		if launch {
+			launchMetadata.BOM = bom
+		}
+
+		var buildMetadata packit.BuildMetadata
+		if build {
+			buildMetadata.BOM = bom
+		}
 
 		pipenvLayer, err := context.Layers.Get(Pipenv)
 		if err != nil {
@@ -84,20 +95,13 @@ func Build(
 		cachedSHA, ok := pipenvLayer.Metadata[DependencySHAKey].(string)
 		if ok && cachedSHA == dependency.SHA256 {
 			logs.Process("Reusing cached layer %s", pipenvLayer.Path)
+			pipenvLayer.Launch, pipenvLayer.Build, pipenvLayer.Cache = launch, build, build
 
-			result := packit.BuildResult{
+			return packit.BuildResult{
 				Layers: []packit.Layer{pipenvLayer},
-			}
-
-			if pipenvLayer.Build {
-				result.Build = packit.BuildMetadata{BOM: boms}
-			}
-
-			if pipenvLayer.Launch {
-				result.Launch = packit.LaunchMetadata{BOM: boms}
-			}
-
-			return result, nil
+				Build:  buildMetadata,
+				Launch: launchMetadata,
+			}, nil
 		}
 
 		pipenvLayer, err = pipenvLayer.Reset()
@@ -105,13 +109,12 @@ func Build(
 			return packit.BuildResult{}, err
 		}
 
-		pipenvLayer.Launch, pipenvLayer.Build = entryResolver.MergeLayerTypes(Pipenv, context.Plan.Entries)
-		pipenvLayer.Cache = pipenvLayer.Build
+		pipenvLayer.Launch, pipenvLayer.Build, pipenvLayer.Cache = launch, build, build
 
 		// Install the pipenv source to a temporary dir, since we only need access to
 		// it as an intermediate step when installing pipenv.
 		// It doesn't need to go into a layer, since we won't need it in future builds.
-		pipEnvReleaseDir, err := ioutil.TempDir("", "pipenv-release")
+		pipEnvReleaseDir, err := os.MkdirTemp("", "pipenv-release")
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
@@ -156,18 +159,10 @@ func Build(
 		logs.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(pipenvLayer.SharedEnv))
 		logs.Break()
 
-		result := packit.BuildResult{
+		return packit.BuildResult{
 			Layers: []packit.Layer{pipenvLayer},
-		}
-
-		if pipenvLayer.Build {
-			result.Build = packit.BuildMetadata{BOM: boms}
-		}
-
-		if pipenvLayer.Launch {
-			result.Launch = packit.LaunchMetadata{BOM: boms}
-		}
-
-		return result, nil
+			Build:  buildMetadata,
+			Launch: launchMetadata,
+		}, nil
 	}
 }

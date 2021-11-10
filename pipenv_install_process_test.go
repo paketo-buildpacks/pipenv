@@ -3,7 +3,6 @@ package pipenv_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -28,10 +27,10 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 
 	it.Before(func() {
 		var err error
-		srcPath, err = ioutil.TempDir("", "pipenv-source")
+		srcPath, err = os.MkdirTemp("", "pipenv-source")
 		Expect(err).NotTo(HaveOccurred())
 
-		destLayerPath, err = ioutil.TempDir("", "pipenv")
+		destLayerPath, err = os.MkdirTemp("", "pipenv")
 		Expect(err).NotTo(HaveOccurred())
 
 		executable = &fakes.Executable{}
