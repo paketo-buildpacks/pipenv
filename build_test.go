@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -42,13 +41,13 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	it.Before(func() {
 		var err error
-		layersDir, err = ioutil.TempDir("", "layers")
+		layersDir, err = os.MkdirTemp("", "layers")
 		Expect(err).NotTo(HaveOccurred())
 
-		cnbDir, err = ioutil.TempDir("", "cnb")
+		cnbDir, err = os.MkdirTemp("", "cnb")
 		Expect(err).NotTo(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(cnbDir, "buildpack.toml"), []byte(`api = "0.2"
+		err = os.WriteFile(filepath.Join(cnbDir, "buildpack.toml"), []byte(`api = "0.2"
 [buildpack]
   id = "org.some-org.some-buildpack"
   name = "Some Buildpack"
@@ -70,6 +69,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
 			Name: "pipenv",
 		}
+		entryResolver.MergeLayerTypesCall.Returns.Build = true
+		entryResolver.MergeLayerTypesCall.Returns.Launch = true
 
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
@@ -146,9 +147,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					},
 					BuildEnv:         packit.Environment{},
 					LaunchEnv:        packit.Environment{},
-					Build:            false,
-					Launch:           false,
-					Cache:            false,
+					Build:            true,
+					Launch:           true,
+					Cache:            true,
 					ProcessLaunchEnv: map[string]packit.Environment{},
 					Metadata: map[string]interface{}{
 						pipenv.DependencySHAKey: "pipenv-dependency-sha",
@@ -156,13 +157,41 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					},
 				},
 			},
+			Build: packit.BuildMetadata{
+				BOM: []packit.BOMEntry{
+					{
+						Name: "pipenv",
+						Metadata: packit.BOMMetadata{
+							Checksum: packit.BOMChecksum{
+								Algorithm: packit.SHA256,
+								Hash:      "pipenv-dependency-sha",
+							},
+							URI:     "pipenv-dependency-uri",
+							Version: "pipenv-dependency-version",
+						},
+					},
+				},
+			},
+			Launch: packit.LaunchMetadata{
+				BOM: []packit.BOMEntry{
+					{
+						Name: "pipenv",
+						Metadata: packit.BOMMetadata{
+							Checksum: packit.BOMChecksum{
+								Algorithm: packit.SHA256,
+								Hash:      "pipenv-dependency-sha",
+							},
+							URI:     "pipenv-dependency-uri",
+							Version: "pipenv-dependency-version",
+						},
+					},
+				},
+			},
 		}))
 
 		Expect(entryResolver.ResolveCall.Receives.String).To(Equal("pipenv"))
 		Expect(entryResolver.ResolveCall.Receives.BuildpackPlanEntrySlice).To(Equal([]packit.BuildpackPlanEntry{
-			{
-				Name: "pipenv",
-			},
+			{Name: "pipenv"},
 		}))
 		Expect(entryResolver.ResolveCall.Receives.InterfaceSlice).To(Equal([]interface{}{"BP_PIPENV_VERSION"}))
 
@@ -206,11 +235,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("when build plan entries require pipenv at build/launch", func() {
-		it.Before(func() {
-			entryResolver.MergeLayerTypesCall.Returns.Build = true
-			entryResolver.MergeLayerTypesCall.Returns.Launch = true
-		})
-
 		it("makes the layer available at the right times", func() {
 			result, err := build(packit.BuildContext{
 				BuildpackInfo: packit.BuildpackInfo{
@@ -264,7 +288,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	context("when rebuilding a layer", func() {
 		it.Before(func() {
-			err := ioutil.WriteFile(filepath.Join(layersDir, fmt.Sprintf("%s.toml", pipenv.Pipenv)), []byte(fmt.Sprintf(`[metadata]
+			err := os.WriteFile(filepath.Join(layersDir, fmt.Sprintf("%s.toml", pipenv.Pipenv)), []byte(fmt.Sprintf(`[metadata]
 			%s = "pipenv-dependency-sha"
 			built_at = "some-build-time"
 			`, pipenv.DependencySHAKey)), os.ModePerm)
@@ -273,11 +297,14 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			err = os.MkdirAll(filepath.Join(layersDir, "pipenv", "env"), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = ioutil.WriteFile(filepath.Join(layersDir, "pipenv", "env", "PYTHONPATH.prepend"), []byte(fmt.Sprintf("%s/pipenv/lib/python3.8/site-packages", layersDir)), os.ModePerm)
+			err = os.WriteFile(filepath.Join(layersDir, "pipenv", "env", "PYTHONPATH.prepend"), []byte(fmt.Sprintf("%s/pipenv/lib/python3.8/site-packages", layersDir)), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
 
-			err = ioutil.WriteFile(filepath.Join(layersDir, "pipenv", "env", "PYTHONPATH.delim"), []byte(":"), os.ModePerm)
+			err = os.WriteFile(filepath.Join(layersDir, "pipenv", "env", "PYTHONPATH.delim"), []byte(":"), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
+
+			entryResolver.MergeLayerTypesCall.Returns.Build = true
+			entryResolver.MergeLayerTypesCall.Returns.Launch = false
 		})
 
 		it("skips the build process if the cached dependency sha matches the selected dependency sha", func() {
@@ -302,23 +329,40 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(buffer.String()).ToNot(ContainSubstring("Executing build process"))
 			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
 
-			Expect(result.Layers).To(Equal([]packit.Layer{
-				{
-					Name: "pipenv",
-					Path: filepath.Join(layersDir, "pipenv"),
-					SharedEnv: packit.Environment{
-						"PYTHONPATH.delim":   ":",
-						"PYTHONPATH.prepend": filepath.Join(layersDir, "pipenv", "lib/python3.8/site-packages"),
+			Expect(result).To(Equal(packit.BuildResult{
+				Layers: []packit.Layer{
+					{
+						Name: "pipenv",
+						Path: filepath.Join(layersDir, "pipenv"),
+						SharedEnv: packit.Environment{
+							"PYTHONPATH.delim":   ":",
+							"PYTHONPATH.prepend": filepath.Join(layersDir, "pipenv", "lib/python3.8/site-packages"),
+						},
+						BuildEnv:         packit.Environment{},
+						LaunchEnv:        packit.Environment{},
+						Build:            true,
+						Launch:           false,
+						Cache:            true,
+						ProcessLaunchEnv: map[string]packit.Environment{},
+						Metadata: map[string]interface{}{
+							pipenv.DependencySHAKey: "pipenv-dependency-sha",
+							"built_at":              "some-build-time",
+						},
 					},
-					BuildEnv:         packit.Environment{},
-					LaunchEnv:        packit.Environment{},
-					Build:            false,
-					Launch:           false,
-					Cache:            false,
-					ProcessLaunchEnv: map[string]packit.Environment{},
-					Metadata: map[string]interface{}{
-						pipenv.DependencySHAKey: "pipenv-dependency-sha",
-						"built_at":              "some-build-time",
+				},
+				Build: packit.BuildMetadata{
+					BOM: []packit.BOMEntry{
+						{
+							Name: "pipenv",
+							Metadata: packit.BOMMetadata{
+								Checksum: packit.BOMChecksum{
+									Algorithm: packit.SHA256,
+									Hash:      "pipenv-dependency-sha",
+								},
+								URI:     "pipenv-dependency-uri",
+								Version: "pipenv-dependency-version",
+							},
+						},
 					},
 				},
 			}))
