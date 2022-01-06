@@ -25,11 +25,11 @@ api = "0.6"
     licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
     purl = "pkg:generic/pipenv@2021.11.23?checksum=1bde859e8bbd1d21d503fd995bc0170048d6da7686ab885f074592c99a16e8f3&download_url=https://files.pythonhosted.org/packages/e2/15/5f3b25028d728b75668ad3c12aa4e1f7f6307c7f495cf3988a4f7c7ba126/pipenv-2021.11.23.tar.gz"
-    sha256 = "da7c767541bbd0dfb3b78070c00e10451f77101708072d65fbae6c81d03ad8af"
+    sha256 = "3987e50f1f0c6ecd30886c42723fd22bd0774b660fcf8abf568ced13618be785"
     source = "https://files.pythonhosted.org/packages/e2/15/5f3b25028d728b75668ad3c12aa4e1f7f6307c7f495cf3988a4f7c7ba126/pipenv-2021.11.23.tar.gz"
     source_sha256 = "1bde859e8bbd1d21d503fd995bc0170048d6da7686ab885f074592c99a16e8f3"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/pipenv/pipenv_2021.11.23_linux_noarch_bionic_da7c7675.tgz"
+    uri = "https://deps.paketo.io/pipenv/pipenv_2021.11.23_linux_noarch_bionic_3987e50f.tgz"
     version = "2021.11.23"
 
   [[metadata.dependency-constraints]]
