@@ -12,25 +12,25 @@ api = "0.6"
     id = "pipenv"
     licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
-    purl = "pkg:generic/pipenv@2020.11.15?checksum=8253fe6f9cfb3791a54da8a0571f73c918cb3457dd908684c1800a13a06ec4c1&download_url=https://files.pythonhosted.org/packages/76/70/3a3fdf4549cff4e9969b2db4ea924c340969b586bf441967ab9c7d90eb52/pipenv-2020.11.15.tar.gz"
-    sha256 = "e60db4162b2df02743a349d07934b3c0c65bb0c6042439b79b31ee5ac923ee47"
-    source = "https://files.pythonhosted.org/packages/76/70/3a3fdf4549cff4e9969b2db4ea924c340969b586bf441967ab9c7d90eb52/pipenv-2020.11.15.tar.gz"
-    source_sha256 = "8253fe6f9cfb3791a54da8a0571f73c918cb3457dd908684c1800a13a06ec4c1"
+    purl = "pkg:generic/pipenv@2021.11.23?checksum=1bde859e8bbd1d21d503fd995bc0170048d6da7686ab885f074592c99a16e8f3&download_url=https://files.pythonhosted.org/packages/e2/15/5f3b25028d728b75668ad3c12aa4e1f7f6307c7f495cf3988a4f7c7ba126/pipenv-2021.11.23.tar.gz"
+    sha256 = "3987e50f1f0c6ecd30886c42723fd22bd0774b660fcf8abf568ced13618be785"
+    source = "https://files.pythonhosted.org/packages/e2/15/5f3b25028d728b75668ad3c12aa4e1f7f6307c7f495cf3988a4f7c7ba126/pipenv-2021.11.23.tar.gz"
+    source_sha256 = "1bde859e8bbd1d21d503fd995bc0170048d6da7686ab885f074592c99a16e8f3"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/pipenv/pipenv_2020.11.15_linux_noarch_bionic_e60db416.tgz"
-    version = "2020.11.15"
+    uri = "https://deps.paketo.io/pipenv/pipenv_2021.11.23_linux_noarch_bionic_3987e50f.tgz"
+    version = "2021.11.23"
 
   [[metadata.dependencies]]
     id = "pipenv"
     licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
-    purl = "pkg:generic/pipenv@2021.5.29?checksum=05958fadcd70b2de6a27542fcd2bd72dd5c59c6d35307fdac3e06361fb06e30e&download_url=https://files.pythonhosted.org/packages/be/c5/a7c300c4589e898db8cfcf26f7065c24e2f5abacaea196a7f80e6695344d/pipenv-2021.5.29.tar.gz"
-    sha256 = "1a1e4325526ec67f77d920dbfb46a8ceb3c4af1dbf30c9730d96d8347b281b3e"
-    source = "https://files.pythonhosted.org/packages/be/c5/a7c300c4589e898db8cfcf26f7065c24e2f5abacaea196a7f80e6695344d/pipenv-2021.5.29.tar.gz"
-    source_sha256 = "05958fadcd70b2de6a27542fcd2bd72dd5c59c6d35307fdac3e06361fb06e30e"
+    purl = "pkg:generic/pipenv@2022.1.8?checksum=f84d7119239b22ab2ac2b8fbc7d619d83cf41135206d72a17c4f151cda529fd0&download_url=https://files.pythonhosted.org/packages/82/71/cd2c9501b2796784eea65213c7a787a2aec6393009a134a6f01c2b89b2a1/pipenv-2022.1.8.tar.gz"
+    sha256 = "3774e1eaf27de04e3efcf1eed00c2740d2bbbe2bc347bda6f6dc0d924761d344"
+    source = "https://files.pythonhosted.org/packages/82/71/cd2c9501b2796784eea65213c7a787a2aec6393009a134a6f01c2b89b2a1/pipenv-2022.1.8.tar.gz"
+    source_sha256 = "f84d7119239b22ab2ac2b8fbc7d619d83cf41135206d72a17c4f151cda529fd0"
     stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/pipenv/pipenv_2021.5.29_linux_noarch_bionic_1a1e4325.tgz"
-    version = "2021.5.29"
+    uri = "https://deps.paketo.io/pipenv/pipenv_2022.1.8_linux_noarch_bionic_3774e1ea.tgz"
+    version = "2022.1.8"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
