@@ -9,11 +9,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/paketo-buildpacks/packit/chronos"
-	"github.com/paketo-buildpacks/packit/scribe"
+	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/chronos"
 
-	"github.com/paketo-buildpacks/packit"
-	"github.com/paketo-buildpacks/packit/postal"
+	//nolint Ignore SA1019, informed usage of deprecated package
+	"github.com/paketo-buildpacks/packit/v2/paketosbom"
+	"github.com/paketo-buildpacks/packit/v2/postal"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 	"github.com/paketo-buildpacks/pipenv"
 	"github.com/paketo-buildpacks/pipenv/fakes"
 	"github.com/sclevine/spec"
@@ -85,9 +87,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
 			{
 				Name: "pipenv",
-				Metadata: packit.BOMMetadata{
-					Checksum: packit.BOMChecksum{
-						Algorithm: packit.SHA256,
+				Metadata: paketosbom.BOMMetadata{
+					Checksum: paketosbom.BOMChecksum{
+						Algorithm: paketosbom.SHA256,
 						Hash:      "pipenv-dependency-sha",
 					},
 					URI:     "pipenv-dependency-uri",
@@ -161,9 +163,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				BOM: []packit.BOMEntry{
 					{
 						Name: "pipenv",
-						Metadata: packit.BOMMetadata{
-							Checksum: packit.BOMChecksum{
-								Algorithm: packit.SHA256,
+						Metadata: paketosbom.BOMMetadata{
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
 								Hash:      "pipenv-dependency-sha",
 							},
 							URI:     "pipenv-dependency-uri",
@@ -176,9 +178,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				BOM: []packit.BOMEntry{
 					{
 						Name: "pipenv",
-						Metadata: packit.BOMMetadata{
-							Checksum: packit.BOMChecksum{
-								Algorithm: packit.SHA256,
+						Metadata: paketosbom.BOMMetadata{
+							Checksum: paketosbom.BOMChecksum{
+								Algorithm: paketosbom.SHA256,
 								Hash:      "pipenv-dependency-sha",
 							},
 							URI:     "pipenv-dependency-uri",
@@ -354,9 +356,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					BOM: []packit.BOMEntry{
 						{
 							Name: "pipenv",
-							Metadata: packit.BOMMetadata{
-								Checksum: packit.BOMChecksum{
-									Algorithm: packit.SHA256,
+							Metadata: paketosbom.BOMMetadata{
+								Checksum: paketosbom.BOMChecksum{
+									Algorithm: paketosbom.SHA256,
 									Hash:      "pipenv-dependency-sha",
 								},
 								URI:     "pipenv-dependency-uri",
