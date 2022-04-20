@@ -10,6 +10,7 @@ import (
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/postal"
+	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
@@ -17,6 +18,7 @@ import (
 //go:generate faux --interface DependencyManager --output fakes/dependency_manager.go
 //go:generate faux --interface InstallProcess --output fakes/install_process.go
 //go:generate faux --interface SitePackageProcess --output fakes/site_package_process.go
+//go:generate faux --interface SBOMGenerator --output fakes/sbom_generator.go
 
 // EntryResolver defines the interface for picking the most relevant entry from
 // the Buildpack Plan entries.
@@ -43,6 +45,10 @@ type SitePackageProcess interface {
 	Execute(targetLayerPath string) (string, error)
 }
 
+type SBOMGenerator interface {
+	GenerateFromDependency(dependency postal.Dependency, dir string) (sbom.SBOM, error)
+}
+
 // Build will return a packit.BuildFunc that will be invoked during the build
 // phase of the buildpack lifecycle.
 //
@@ -54,16 +60,17 @@ func Build(
 	dependencyManager DependencyManager,
 	installProcess InstallProcess,
 	siteProcess SitePackageProcess,
-	logs scribe.Emitter,
+	sbomGenerator SBOMGenerator,
+	logger scribe.Emitter,
 	clock chronos.Clock,
 ) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		logs.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
+		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 
-		logs.Process("Resolving Pipenv version")
+		logger.Process("Resolving Pipenv version")
 		entry, sortedEntries := entryResolver.Resolve(Pipenv, context.Plan.Entries, Priorities)
 
-		logs.Candidates(sortedEntries)
+		logger.Candidates(sortedEntries)
 
 		version, _ := entry.Metadata["version"].(string)
 
@@ -72,19 +79,19 @@ func Build(
 			return packit.BuildResult{}, err
 		}
 
-		logs.SelectedDependency(entry, dependency, clock.Now())
+		logger.SelectedDependency(entry, dependency, clock.Now())
 
-		bom := dependencyManager.GenerateBillOfMaterials(dependency)
+		legacySBOM := dependencyManager.GenerateBillOfMaterials(dependency)
 		launch, build := entryResolver.MergeLayerTypes(Pipenv, context.Plan.Entries)
 
 		var launchMetadata packit.LaunchMetadata
 		if launch {
-			launchMetadata.BOM = bom
+			launchMetadata.BOM = legacySBOM
 		}
 
 		var buildMetadata packit.BuildMetadata
 		if build {
-			buildMetadata.BOM = bom
+			buildMetadata.BOM = legacySBOM
 		}
 
 		pipenvLayer, err := context.Layers.Get(Pipenv)
@@ -94,7 +101,7 @@ func Build(
 
 		cachedSHA, ok := pipenvLayer.Metadata[DependencySHAKey].(string)
 		if ok && cachedSHA == dependency.SHA256 {
-			logs.Process("Reusing cached layer %s", pipenvLayer.Path)
+			logger.Process("Reusing cached layer %s", pipenvLayer.Path)
 			pipenvLayer.Launch, pipenvLayer.Build, pipenvLayer.Cache = launch, build, build
 
 			return packit.BuildResult{
@@ -119,8 +126,8 @@ func Build(
 			return packit.BuildResult{}, err
 		}
 
-		logs.Process("Executing build process")
-		logs.Subprocess(fmt.Sprintf("Installing Pipenv %s", dependency.Version))
+		logger.Process("Executing build process")
+		logger.Subprocess(fmt.Sprintf("Installing Pipenv %s", dependency.Version))
 
 		duration, err := clock.Measure(func() error {
 			err = dependencyManager.Deliver(dependency, context.CNBPath, pipEnvReleaseDir, context.Platform.Path)
@@ -135,8 +142,27 @@ func Build(
 			return packit.BuildResult{}, err
 		}
 
-		logs.Action("Completed in %s", duration.Round(time.Millisecond))
-		logs.Break()
+		logger.Action("Completed in %s", duration.Round(time.Millisecond))
+		logger.Break()
+
+		logger.GeneratingSBOM(pipenvLayer.Path)
+		var sbomContent sbom.SBOM
+		duration, err = clock.Measure(func() error {
+			sbomContent, err = sbomGenerator.GenerateFromDependency(dependency, pipenvLayer.Path)
+			return err
+		})
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
+
+		logger.Action("Completed in %s", duration.Round(time.Millisecond))
+		logger.Break()
+
+		logger.FormattingSBOM(context.BuildpackInfo.SBOMFormats...)
+		pipenvLayer.SBOM, err = sbomContent.InFormats(context.BuildpackInfo.SBOMFormats...)
+		if err != nil {
+			return packit.BuildResult{}, err
+		}
 
 		pipenvLayer.Metadata = map[string]interface{}{
 			DependencySHAKey: dependency.SHA256,
@@ -155,9 +181,9 @@ func Build(
 
 		pipenvLayer.SharedEnv.Prepend("PYTHONPATH", strings.TrimRight(sitePackagesPath, "\n"), ":")
 
-		logs.Process("Configuring environment")
-		logs.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(pipenvLayer.SharedEnv))
-		logs.Break()
+		logger.Process("Configuring environment")
+		logger.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(pipenvLayer.SharedEnv))
+		logger.Break()
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{pipenvLayer},

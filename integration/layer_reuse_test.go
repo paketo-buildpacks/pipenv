@@ -167,13 +167,16 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				"    Candidate version sources (in priority order):",
 				MatchRegexp(`      BP_PIPENV_VERSION -> "\d+\.\d+\.\d+"`),
 				"      <unknown>         -> \"\"",
-				"",
+			))
+			Expect(logs).To(ContainLines(
 				fmt.Sprintf(`    Selected Pipenv version (using BP_PIPENV_VERSION): %s`, buildpackInfo.Metadata.Dependencies[1].Version),
-				"",
+			))
+			Expect(logs).To(ContainLines(
 				"  Executing build process",
 				MatchRegexp(`    Installing Pipenv \d+\.\d+\.\d+`),
 				MatchRegexp(`      Completed in ([0-9]*(\.[0-9]*)?[a-z]+)+`),
-				"",
+			))
+			Expect(logs).To(ContainLines(
 				"  Configuring environment",
 				MatchRegexp(fmt.Sprintf(`    PYTHONPATH -> "\/layers\/%s\/pipenv\/lib\/python\d+\.\d+\/site-packages:\$PYTHONPATH"`, strings.ReplaceAll(buildpackInfo.Buildpack.ID, "/", "_"))),
 			))

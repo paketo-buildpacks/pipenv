@@ -1,8 +1,9 @@
-api = "0.6"
+api = "0.7"
 
 [buildpack]
   id = "paketo-buildpacks/pipenv"
   name = "Paketo Pipenv Buildpack"
+  sbom-formats = ["application/vnd.cyclonedx+json", "application/spdx+json", "application/vnd.syft+json"]
 
   [[buildpack.licenses]]
     type = "Apache-2.0"
@@ -23,6 +24,7 @@ api = "0.6"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://deps.paketo.io/pipenv/pipenv_2022.3.28_linux_noarch_bionic_3303d151.tgz"
     version = "2022.3.28"
+    cpe = "cpe:2.3:a:pypa:pipenv:2022.3.28:*:*:*:*:python:*:*"
 
   [[metadata.dependencies]]
     id = "pipenv"
@@ -35,6 +37,7 @@ api = "0.6"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://deps.paketo.io/pipenv/pipenv_2022.4.8_linux_noarch_bionic_08fece45.tgz"
     version = "2022.4.8"
+    cpe = "cpe:2.3:a:pypa:pipenv:2022.4.8:*:*:*:*:python:*:*"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
