@@ -166,7 +166,6 @@ func Build(
 
 		pipenvLayer.Metadata = map[string]interface{}{
 			DependencySHAKey: dependency.SHA256,
-			"built_at":       clock.Now().Format(time.RFC3339Nano),
 		}
 
 		// Look up the site packages path and prepend it onto $PYTHONPATH

@@ -115,7 +115,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 			}).Should(MatchRegexp(`pipenv, version \d+\.\d+\.\d+`))
 
 			Expect(secondImage.Buildpacks[2].Key).To(Equal(buildpackInfo.Buildpack.ID))
-			Expect(secondImage.Buildpacks[2].Layers["pipenv"].Metadata["built_at"]).To(Equal(firstImage.Buildpacks[2].Layers["pipenv"].Metadata["built_at"]))
+			Expect(secondImage.Buildpacks[2].Layers["pipenv"].SHA).To(Equal(firstImage.Buildpacks[2].Layers["pipenv"].SHA))
 		})
 	})
 
@@ -195,7 +195,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 			}).Should(MatchRegexp(`pipenv, version \d+\.\d+\.\d+`))
 
 			Expect(secondImage.Buildpacks[2].Key).To(Equal(buildpackInfo.Buildpack.ID))
-			Expect(secondImage.Buildpacks[2].Layers["pipenv"].Metadata["built_at"]).ToNot(Equal(firstImage.Buildpacks[2].Layers["pipenv"].Metadata["built_at"]))
+			Expect(secondImage.Buildpacks[2].Layers["pipenv"].SHA).ToNot(Equal(firstImage.Buildpacks[2].Layers["pipenv"].SHA))
 		})
 	})
 }
