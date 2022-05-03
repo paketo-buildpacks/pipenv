@@ -6,7 +6,6 @@ import (
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
-	"github.com/paketo-buildpacks/packit/v2/draft"
 	"github.com/paketo-buildpacks/packit/v2/pexec"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
@@ -26,7 +25,6 @@ func main() {
 	packit.Run(
 		pipenv.Detect(),
 		pipenv.Build(
-			draft.NewPlanner(),
 			postal.NewService(cargo.NewTransport()),
 			pipenv.NewPipenvInstallProcess(pexec.NewExecutable("pip")),
 			pipenv.NewSiteProcess(pexec.NewExecutable("python")),
