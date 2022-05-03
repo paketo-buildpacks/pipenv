@@ -30,7 +30,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		layersDir string
 		cnbDir    string
 
-		entryResolver     *fakes.EntryResolver
 		dependencyManager *fakes.DependencyManager
 		installProcess    *fakes.InstallProcess
 		siteProcess       *fakes.SitePackageProcess
@@ -51,11 +50,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		cnbDir, err = os.MkdirTemp("", "cnb")
 		Expect(err).NotTo(HaveOccurred())
-
-		entryResolver = &fakes.EntryResolver{}
-		entryResolver.ResolveCall.Returns.BuildpackPlanEntry = packit.BuildpackPlanEntry{
-			Name: "pipenv",
-		}
 
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
@@ -95,7 +89,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		siteProcess.ExecuteCall.Returns.String = filepath.Join(layersDir, "pipenv", "lib", "python3.8", "site-packages")
 
 		build = pipenv.Build(
-			entryResolver,
 			dependencyManager,
 			installProcess,
 			siteProcess,
@@ -166,12 +159,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			},
 		}))
 
-		Expect(entryResolver.ResolveCall.Receives.String).To(Equal("pipenv"))
-		Expect(entryResolver.ResolveCall.Receives.BuildpackPlanEntrySlice).To(Equal([]packit.BuildpackPlanEntry{
-			{Name: "pipenv"},
-		}))
-		Expect(entryResolver.ResolveCall.Receives.InterfaceSlice).To(Equal([]interface{}{"BP_PIPENV_VERSION"}))
-
 		Expect(dependencyManager.ResolveCall.Receives.Path).To(Equal(filepath.Join(cnbDir, "buildpack.toml")))
 		Expect(dependencyManager.ResolveCall.Receives.Id).To(Equal("pipenv"))
 		Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal(""))
@@ -185,13 +172,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				Stacks:  []string{"some-stack"},
 				URI:     "pipenv-dependency-uri",
 				Version: "pipenv-dependency-version",
-			},
-		}))
-
-		Expect(entryResolver.MergeLayerTypesCall.Receives.String).To(Equal("pipenv"))
-		Expect(entryResolver.MergeLayerTypesCall.Receives.BuildpackPlanEntrySlice).To(Equal([]packit.BuildpackPlanEntry{
-			{
-				Name: "pipenv",
 			},
 		}))
 
@@ -215,8 +195,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 	context("when build plan entries require pipenv at build/launch", func() {
 		it.Before(func() {
-			entryResolver.MergeLayerTypesCall.Returns.Build = true
-			entryResolver.MergeLayerTypesCall.Returns.Launch = true
+			buildContext.Plan.Entries[0].Metadata = make(map[string]interface{})
+			buildContext.Plan.Entries[0].Metadata["build"] = true
+			buildContext.Plan.Entries[0].Metadata["launch"] = true
 		})
 
 		it("makes the layer available at the right times", func() {
@@ -275,8 +256,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			`, pipenv.DependencySHAKey)), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
 
-			entryResolver.MergeLayerTypesCall.Returns.Build = true
-			entryResolver.MergeLayerTypesCall.Returns.Launch = false
+			buildContext.Plan.Entries[0].Metadata = make(map[string]interface{})
+			buildContext.Plan.Entries[0].Metadata["build"] = true
+			buildContext.Plan.Entries[0].Metadata["launch"] = false
 		})
 
 		it("skips the build process if the cached dependency sha matches the selected dependency sha", func() {
