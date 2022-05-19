@@ -59,10 +59,10 @@ func testDefault(t *testing.T, context spec.G, it spec.S) {
 			image, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
 				WithBuildpacks(
-					settings.Buildpacks.CPython.Online,
-					settings.Buildpacks.Pip.Online,
-					settings.Buildpacks.Pipenv.Online,
-					settings.Buildpacks.BuildPlan.Online,
+					settings.Buildpacks.CPython,
+					settings.Buildpacks.Pip,
+					settings.Buildpacks.Pipenv,
+					settings.Buildpacks.BuildPlan,
 				).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
@@ -122,10 +122,10 @@ func testDefault(t *testing.T, context spec.G, it spec.S) {
 				image, logs, err = pack.WithNoColor().Build.
 					WithPullPolicy("never").
 					WithBuildpacks(
-						settings.Buildpacks.CPython.Online,
-						settings.Buildpacks.Pip.Online,
-						settings.Buildpacks.Pipenv.Online,
-						settings.Buildpacks.BuildPlan.Online,
+						settings.Buildpacks.CPython,
+						settings.Buildpacks.Pip,
+						settings.Buildpacks.Pipenv,
+						settings.Buildpacks.BuildPlan,
 					).
 					WithEnv(map[string]string{
 						"BP_LOG_LEVEL": "DEBUG",

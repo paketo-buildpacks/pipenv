@@ -61,6 +61,11 @@ file that looks like the following:
     launch = true
 ```
 
+## Limitations
+
+This buildpack requires internet connectivity to install `pipenv`. Installation
+in an air-gapped environment is not supported.
+
 ## Usage
 
 To package this buildpack for consumption:
