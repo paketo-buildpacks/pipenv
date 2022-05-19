@@ -30,21 +30,10 @@ var buildpackInfo struct {
 
 var settings struct {
 	Buildpacks struct {
-		CPython struct {
-			Online  string
-			Offline string
-		}
-		Pip struct {
-			Online  string
-			Offline string
-		}
-		Pipenv struct {
-			Online  string
-			Offline string
-		}
-		BuildPlan struct {
-			Online string
-		}
+		CPython   string
+		Pip       string
+		Pipenv    string
+		BuildPlan string
 	}
 
 	Config struct {
@@ -79,36 +68,20 @@ func TestIntegration(t *testing.T) {
 
 	buildpackStore := occam.NewBuildpackStore()
 
-	settings.Buildpacks.Pipenv.Online, err = buildpackStore.Get.
+	settings.Buildpacks.Pipenv, err = buildpackStore.Get.
 		WithVersion("1.2.3").
 		Execute(root)
 	Expect(err).NotTo(HaveOccurred())
 
-	settings.Buildpacks.Pipenv.Offline, err = buildpackStore.Get.
-		WithVersion("1.2.3").
-		WithOfflineDependencies().
-		Execute(root)
-	Expect(err).NotTo(HaveOccurred())
-
-	settings.Buildpacks.Pip.Online, err = buildpackStore.Get.
+	settings.Buildpacks.Pip, err = buildpackStore.Get.
 		Execute(settings.Config.Pip)
 	Expect(err).NotTo(HaveOccurred())
 
-	settings.Buildpacks.Pip.Offline, err = buildpackStore.Get.
-		WithOfflineDependencies().
-		Execute(settings.Config.Pip)
-	Expect(err).NotTo(HaveOccurred())
-
-	settings.Buildpacks.CPython.Online, err = buildpackStore.Get.
+	settings.Buildpacks.CPython, err = buildpackStore.Get.
 		Execute(settings.Config.CPython)
 	Expect(err).NotTo(HaveOccurred())
 
-	settings.Buildpacks.CPython.Offline, err = buildpackStore.Get.
-		WithOfflineDependencies().
-		Execute(settings.Config.CPython)
-	Expect(err).NotTo(HaveOccurred())
-
-	settings.Buildpacks.BuildPlan.Online, err = buildpackStore.Get.
+	settings.Buildpacks.BuildPlan, err = buildpackStore.Get.
 		Execute(settings.Config.BuildPlan)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -117,6 +90,5 @@ func TestIntegration(t *testing.T) {
 	suite := spec.New("Integration", spec.Report(report.Terminal{}))
 	suite("Default", testDefault, spec.Parallel())
 	suite("LayerReuse", testLayerReuse, spec.Parallel())
-	suite("Offline", testOffline, spec.Parallel())
 	suite.Run(t)
 }
