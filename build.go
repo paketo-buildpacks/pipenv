@@ -174,9 +174,7 @@ func Build(
 
 		pipenvLayer.SharedEnv.Prepend("PYTHONPATH", strings.TrimRight(sitePackagesPath, "\n"), ":")
 
-		logger.Process("Configuring environment")
-		logger.Subprocess("%s", scribe.NewFormattedMapFromEnvironment(pipenvLayer.SharedEnv))
-		logger.Break()
+		logger.EnvironmentVariables(pipenvLayer)
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{pipenvLayer},
