@@ -2,7 +2,6 @@ package pipenv
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -24,13 +23,12 @@ import (
 // dependency and installing it.
 type DependencyManager interface {
 	Resolve(path, id, version, stack string) (postal.Dependency, error)
-	Deliver(dependency postal.Dependency, cnbPath, destPath, platformPath string) error
 	GenerateBillOfMaterials(dependencies ...postal.Dependency) []packit.BOMEntry
 }
 
 // InstallProcess defines the interface for installing the pipenv dependency into a layer.
 type InstallProcess interface {
-	Execute(srcPath, destLayerPath string) error
+	Execute(version, destLayerPath string) error
 }
 
 // SitePackageProcess defines the interface for looking up site packages within a layer.
@@ -112,24 +110,11 @@ func Build(
 
 		pipenvLayer.Launch, pipenvLayer.Build, pipenvLayer.Cache = launch, build, build
 
-		// Install the pipenv source to a temporary dir, since we only need access to
-		// it as an intermediate step when installing pipenv.
-		// It doesn't need to go into a layer, since we won't need it in future builds.
-		pipEnvReleaseDir, err := os.MkdirTemp("", "pipenv-release")
-		if err != nil {
-			return packit.BuildResult{}, err
-		}
-
 		logger.Process("Executing build process")
 		logger.Subprocess(fmt.Sprintf("Installing Pipenv %s", dependency.Version))
 
 		duration, err := clock.Measure(func() error {
-			err = dependencyManager.Deliver(dependency, context.CNBPath, pipEnvReleaseDir, context.Platform.Path)
-			if err != nil {
-				return err
-			}
-
-			return installProcess.Execute(pipEnvReleaseDir, pipenvLayer.Path)
+			return installProcess.Execute(dependency.Version, pipenvLayer.Path)
 		})
 
 		if err != nil {
