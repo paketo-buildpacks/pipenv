@@ -3,8 +3,7 @@ The Paketo Pipenv Buildpack is a Cloud Native Buildpack that installs
 [pipenv](https://pypi.org/project/pipenv) into a layer and makes it available
 on the `PATH`.
 
-The buildpack is published for consumption at `gcr.io/paketo-buildpacks/pipenv`
-and `paketocommunity/pipenv`.
+The buildpack is published for consumption at `gcr.io/paketo-buildpacks/pipenv`.
 
 ## Behavior
 This buildpack always participates.
@@ -20,7 +19,7 @@ The buildpack will do the following:
 ## Configuration
 | Environment Variable | Description
 | -------------------- | -----------
-| `$BP_PIPENV_VERSION` | Configure the version of pipenv to install. Buildpack releases (and the pipenv versions for each release) can be found [here](https://github.com/paketo-buildpacks/pipenv/releases).
+| `$BP_PIPENV_VERSION` | Configure the version of pipenv to install. Buildpack releases (and the supported pipenv versions for each release) can be found [here](https://github.com/paketo-buildpacks/pipenv/releases).
 
 ## Integration
 
@@ -65,6 +64,12 @@ file that looks like the following:
 
 This buildpack requires internet connectivity to install `pipenv`. Installation
 in an air-gapped environment is not supported.
+
+The dependency URL metadata contained in `buildpack.toml` is not actually used,
+as `pipenv` is installed directly from the internet. However, the rest of the
+depedency metadata is used (e.g. for generating an SBOM). This will be
+addressed in upcoming work which will change the way dependencies are consumed
+by buildpacks.
 
 ## Usage
 

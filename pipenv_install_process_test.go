@@ -18,7 +18,7 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
-		srcPath       string
+		version       string
 		destLayerPath string
 		executable    *fakes.Executable
 
@@ -27,11 +27,10 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 
 	it.Before(func() {
 		var err error
-		srcPath, err = os.MkdirTemp("", "pipenv-source")
-		Expect(err).NotTo(HaveOccurred())
-
 		destLayerPath, err = os.MkdirTemp("", "pipenv")
 		Expect(err).NotTo(HaveOccurred())
+
+		version = "1.2.3-some.version"
 
 		executable = &fakes.Executable{}
 
@@ -41,11 +40,11 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 	context("Execute", func() {
 		context("there is a pipenv dependency to install", func() {
 			it("installs it to the pipenv layer", func() {
-				err := pipenvInstallProcess.Execute(srcPath, destLayerPath)
+				err := pipenvInstallProcess.Execute(version, destLayerPath)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(executable.ExecuteCall.Receives.Execution.Env).To(Equal(append(os.Environ(), fmt.Sprintf("PYTHONUSERBASE=%s", destLayerPath))))
-				Expect(executable.ExecuteCall.Receives.Execution.Args).To(Equal([]string{"install", "pipenv", "--user", fmt.Sprintf("--find-links=%s", srcPath)}))
+				Expect(executable.ExecuteCall.Receives.Execution.Args).To(Equal([]string{"install", "pipenv==1.2.3-some.version", "--user"}))
 			})
 		})
 
@@ -60,7 +59,7 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 				})
 
 				it("returns an error", func() {
-					err := pipenvInstallProcess.Execute(srcPath, destLayerPath)
+					err := pipenvInstallProcess.Execute(version, destLayerPath)
 					Expect(err).To(MatchError(ContainSubstring("installing pipenv failed")))
 					Expect(err).To(MatchError(ContainSubstring("stdout output")))
 					Expect(err).To(MatchError(ContainSubstring("stderr output")))

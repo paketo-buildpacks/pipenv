@@ -175,21 +175,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			},
 		}))
 
-		Expect(dependencyManager.DeliverCall.Receives.Dependency).To(Equal(postal.Dependency{
-			ID:      "pipenv",
-			Name:    "pipenv-dependency-name",
-			SHA256:  "pipenv-dependency-sha",
-			Stacks:  []string{"some-stack"},
-			URI:     "pipenv-dependency-uri",
-			Version: "pipenv-dependency-version",
-		}))
-		Expect(dependencyManager.DeliverCall.Receives.CnbPath).To(Equal(cnbDir))
-		Expect(dependencyManager.DeliverCall.Receives.DestPath).To(ContainSubstring("pipenv-release"))
-		Expect(dependencyManager.DeliverCall.Receives.PlatformPath).To(Equal("some-platform-path"))
-
 		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(filepath.Join(layersDir, "pipenv")))
 
-		Expect(installProcess.ExecuteCall.Receives.SrcPath).To(ContainSubstring("pipenv-release"))
+		Expect(installProcess.ExecuteCall.Receives.Version).To(ContainSubstring("pipenv-dependency-version"))
 		Expect(installProcess.ExecuteCall.Receives.DestLayerPath).To(Equal(filepath.Join(layersDir, "pipenv")))
 	})
 
@@ -276,7 +264,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 			Expect(buffer.String()).To(ContainSubstring("Reusing cached layer"))
 
-			Expect(dependencyManager.DeliverCall.CallCount).To(Equal(0))
 			Expect(installProcess.ExecuteCall.CallCount).To(Equal(0))
 		})
 	})
@@ -323,17 +310,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				_, err := build(buildContext)
 
 				Expect(err).To(MatchError(ContainSubstring("permission denied")))
-			})
-		})
-
-		context("when dependency cannot be delivered", func() {
-			it.Before(func() {
-				dependencyManager.DeliverCall.Returns.Error = errors.New("failed to deliver dependency")
-			})
-			it("returns an error", func() {
-				_, err := build(buildContext)
-
-				Expect(err).To(MatchError(ContainSubstring("failed to deliver dependency")))
 			})
 		})
 
