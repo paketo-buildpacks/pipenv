@@ -14,19 +14,6 @@ api = "0.7"
   pre-package = "./scripts/build.sh"
 
   [[metadata.dependencies]]
-    cpe = "cpe:2.3:a:pypa:pipenv:2022.6.7:*:*:*:*:python:*:*"
-    id = "pipenv"
-    licenses = ["MIT", "MIT-0"]
-    name = "Pipenv"
-    purl = "pkg:generic/pipenv@2022.6.7?checksum=6ac0e7a8bbe02859d46c53c03d3f33136bbf49c8c7d9a6d818409e17a604eda0&download_url=https://files.pythonhosted.org/packages/14/15/72379e0884455c9b517015e8e5771c69e13749799af460e9199c3c7f6ab9/pipenv-2022.6.7.tar.gz"
-    sha256 = "83fa44a967c1765ec29816c03b7688b81373a5c3d14d02b72206b68a8ff43c51"
-    source = "https://files.pythonhosted.org/packages/14/15/72379e0884455c9b517015e8e5771c69e13749799af460e9199c3c7f6ab9/pipenv-2022.6.7.tar.gz"
-    source_sha256 = "6ac0e7a8bbe02859d46c53c03d3f33136bbf49c8c7d9a6d818409e17a604eda0"
-    stacks = ["io.buildpacks.stacks.bionic"]
-    uri = "https://deps.paketo.io/pipenv/pipenv_2022.6.7_linux_noarch_bionic_83fa44a9.tgz"
-    version = "2022.6.7"
-
-  [[metadata.dependencies]]
     cpe = "cpe:2.3:a:pypa:pipenv:2022.7.4:*:*:*:*:python:*:*"
     id = "pipenv"
     licenses = ["MIT", "MIT-0"]
@@ -38,6 +25,19 @@ api = "0.7"
     stacks = ["io.buildpacks.stacks.bionic"]
     uri = "https://deps.paketo.io/pipenv/pipenv_2022.7.4_linux_noarch_bionic_4c4c5a71.tgz"
     version = "2022.7.4"
+
+  [[metadata.dependencies]]
+    cpe = "cpe:2.3:a:pypa:pipenv:2022.7.24:*:*:*:*:python:*:*"
+    id = "pipenv"
+    licenses = ["MIT", "MIT-0"]
+    name = "Pipenv"
+    purl = "pkg:generic/pipenv@2022.7.24?checksum=374e63450220d7abb298cbaee06c4b02274e6f1cb2ce7b7b677fd5fd3dd30841&download_url=https://files.pythonhosted.org/packages/e4/2a/2105cf9ff5bface220d3b6e0e82e38a5b3864fc2b444f90d908b1d12f748/pipenv-2022.7.24.tar.gz"
+    sha256 = "3922d642d47bac7571c56d638a42fa3f8485b426a41734e2ac33788a0c568007"
+    source = "https://files.pythonhosted.org/packages/e4/2a/2105cf9ff5bface220d3b6e0e82e38a5b3864fc2b444f90d908b1d12f748/pipenv-2022.7.24.tar.gz"
+    source_sha256 = "374e63450220d7abb298cbaee06c4b02274e6f1cb2ce7b7b677fd5fd3dd30841"
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
+    uri = "https://deps.paketo.io/pipenv/pipenv_2022.7.24_linux_noarch_bionic_3922d642.tgz"
+    version = "2022.7.24"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
