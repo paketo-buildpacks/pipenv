@@ -10,10 +10,8 @@ import (
 
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
+	"github.com/paketo-buildpacks/packit/v2/fs"
 
-	//nolint Ignore SA1019, informed usage of deprecated package
-	"github.com/paketo-buildpacks/packit/v2/paketosbom"
-	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/sbom"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
 	"github.com/paketo-buildpacks/pipenv"
@@ -30,10 +28,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		layersDir string
 		cnbDir    string
 
-		dependencyManager *fakes.DependencyManager
-		installProcess    *fakes.InstallProcess
-		siteProcess       *fakes.SitePackageProcess
-		sbomGenerator     *fakes.SBOMGenerator
+		installProcess *fakes.InstallProcess
+		siteProcess    *fakes.SitePackageProcess
+		sbomGenerator  *fakes.SBOMGenerator
 
 		buffer *bytes.Buffer
 
@@ -51,37 +48,14 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		cnbDir, err = os.MkdirTemp("", "cnb")
 		Expect(err).NotTo(HaveOccurred())
 
-		dependencyManager = &fakes.DependencyManager{}
-		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
-			ID:      "pipenv",
-			Name:    "pipenv-dependency-name",
-			SHA256:  "pipenv-dependency-sha",
-			Stacks:  []string{"some-stack"},
-			URI:     "pipenv-dependency-uri",
-			Version: "pipenv-dependency-version",
-		}
-
-		// Legacy SBOM
-		dependencyManager.GenerateBillOfMaterialsCall.Returns.BOMEntrySlice = []packit.BOMEntry{
-			{
-				Name: "pipenv",
-				Metadata: paketosbom.BOMMetadata{
-					Checksum: paketosbom.BOMChecksum{
-						Algorithm: paketosbom.SHA256,
-						Hash:      "pipenv-dependency-sha",
-					},
-					URI:     "pipenv-dependency-uri",
-					Version: "pipenv-dependency-version",
-				},
-			},
-		}
+		Expect(fs.Copy("buildpack.toml", filepath.Join(cnbDir, "buildpack.toml"))).To(Succeed())
 
 		installProcess = &fakes.InstallProcess{}
 		siteProcess = &fakes.SitePackageProcess{}
 
 		// Syft SBOM
 		sbomGenerator = &fakes.SBOMGenerator{}
-		sbomGenerator.GenerateFromDependencyCall.Returns.SBOM = sbom.SBOM{}
+		sbomGenerator.GenerateCall.Returns.SBOM = sbom.SBOM{}
 
 		buffer = bytes.NewBuffer(nil)
 		logEmitter = scribe.NewEmitter(buffer)
@@ -89,7 +63,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		siteProcess.ExecuteCall.Returns.String = filepath.Join(layersDir, "pipenv", "lib", "python3.8", "site-packages")
 
 		build = pipenv.Build(
-			dependencyManager,
 			installProcess,
 			siteProcess,
 			sbomGenerator,
@@ -146,7 +119,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		Expect(layer.Cache).To(BeFalse())
 
 		Expect(layer.Metadata).To(HaveLen(1))
-		Expect(layer.Metadata["dependency_sha"]).To(Equal("pipenv-dependency-sha"))
+		Expect(layer.Metadata[pipenv.PipenvVersion]).To(Equal("2022.7.24"))
 
 		Expect(layer.SBOM.Formats()).To(Equal([]packit.SBOMFormat{
 			{
@@ -159,25 +132,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			},
 		}))
 
-		Expect(dependencyManager.ResolveCall.Receives.Path).To(Equal(filepath.Join(cnbDir, "buildpack.toml")))
-		Expect(dependencyManager.ResolveCall.Receives.Id).To(Equal("pipenv"))
-		Expect(dependencyManager.ResolveCall.Receives.Version).To(Equal(""))
-		Expect(dependencyManager.ResolveCall.Receives.Stack).To(Equal("some-stack"))
-
-		Expect(dependencyManager.GenerateBillOfMaterialsCall.Receives.Dependencies).To(Equal([]postal.Dependency{
-			{
-				ID:      "pipenv",
-				Name:    "pipenv-dependency-name",
-				SHA256:  "pipenv-dependency-sha",
-				Stacks:  []string{"some-stack"},
-				URI:     "pipenv-dependency-uri",
-				Version: "pipenv-dependency-version",
-			},
-		}))
-
-		Expect(sbomGenerator.GenerateFromDependencyCall.Receives.Dir).To(Equal(filepath.Join(layersDir, "pipenv")))
-
-		Expect(installProcess.ExecuteCall.Receives.Version).To(ContainSubstring("pipenv-dependency-version"))
+		Expect(installProcess.ExecuteCall.Receives.Version).To(ContainSubstring("2022.7.24"))
 		Expect(installProcess.ExecuteCall.Receives.DestLayerPath).To(Equal(filepath.Join(layersDir, "pipenv")))
 	})
 
@@ -200,48 +155,15 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(layer.Build).To(BeTrue())
 			Expect(layer.Launch).To(BeTrue())
 			Expect(layer.Cache).To(BeTrue())
-
-			Expect(result.Build.BOM).To(Equal(
-				[]packit.BOMEntry{
-					{
-						Name: "pipenv",
-						Metadata: paketosbom.BOMMetadata{
-							Checksum: paketosbom.BOMChecksum{
-								Algorithm: paketosbom.SHA256,
-								Hash:      "pipenv-dependency-sha",
-							},
-							URI:     "pipenv-dependency-uri",
-							Version: "pipenv-dependency-version",
-						},
-					},
-				},
-			))
-
-			Expect(result.Launch.BOM).To(Equal(
-				[]packit.BOMEntry{
-					{
-						Name: "pipenv",
-						Metadata: paketosbom.BOMMetadata{
-							Checksum: paketosbom.BOMChecksum{
-								Algorithm: paketosbom.SHA256,
-								Hash:      "pipenv-dependency-sha",
-							},
-							URI:     "pipenv-dependency-uri",
-							Version: "pipenv-dependency-version",
-						},
-					},
-				},
-			))
-
 		})
 	})
 
 	context("when rebuilding a layer", func() {
 		it.Before(func() {
 			err := os.WriteFile(filepath.Join(layersDir, fmt.Sprintf("%s.toml", pipenv.Pipenv)), []byte(fmt.Sprintf(`[metadata]
-			%s = "pipenv-dependency-sha"
+			%s = "2022.7.24"
 			built_at = "some-build-time"
-			`, pipenv.DependencySHAKey)), os.ModePerm)
+			`, pipenv.PipenvVersion)), os.ModePerm)
 			Expect(err).NotTo(HaveOccurred())
 
 			buildContext.Plan.Entries[0].Metadata = make(map[string]interface{})
@@ -269,17 +191,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 	})
 
 	context("failure cases", func() {
-		context("when dependency resolution fails", func() {
-			it.Before(func() {
-				dependencyManager.ResolveCall.Returns.Error = errors.New("failed to resolve dependency")
-			})
-			it("returns an error", func() {
-				_, err := build(buildContext)
-
-				Expect(err).To(MatchError(ContainSubstring("failed to resolve dependency")))
-			})
-		})
-
 		context("when pipenv layer cannot be fetched", func() {
 			it.Before(func() {
 				Expect(os.Chmod(layersDir, 0000)).To(Succeed())
@@ -359,7 +270,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		context("when formatting the SBOM returns an error", func() {
 			it.Before(func() {
-				sbomGenerator.GenerateFromDependencyCall.Returns.Error = errors.New("failed to generate SBOM")
+				sbomGenerator.GenerateCall.Returns.Error = errors.New("failed to generate SBOM")
 			})
 
 			it("returns an error", func() {

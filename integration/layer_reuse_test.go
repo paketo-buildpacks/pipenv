@@ -143,7 +143,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 					settings.Buildpacks.Pipenv,
 					settings.Buildpacks.BuildPlan,
 				).
-				WithEnv(map[string]string{"BP_PIPENV_VERSION": buildpackInfo.Metadata.Dependencies[0].Version}).
+				WithEnv(map[string]string{"BP_PIPENV_VERSION": buildpackInfo.Metadata.DefaultVersions.Pipenv}).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -155,7 +155,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 					settings.Buildpacks.Pipenv,
 					settings.Buildpacks.BuildPlan,
 				).
-				WithEnv(map[string]string{"BP_PIPENV_VERSION": buildpackInfo.Metadata.Dependencies[1].Version}).
+				WithEnv(map[string]string{"BP_PIPENV_VERSION": "2022.7.4"}).
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
@@ -165,11 +165,12 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(fmt.Sprintf(`%s \d+\.\d+\.\d+`, buildpackInfo.Buildpack.Name)),
 				"  Resolving Pipenv version",
 				"    Candidate version sources (in priority order):",
-				MatchRegexp(`      BP_PIPENV_VERSION -> "\d+\.\d+\.\d+"`),
-				"      <unknown>         -> \"\"",
+				`      BP_PIPENV_VERSION -> "2022.7.4"`,
+				`      default-versions  -> "2022.7.24"`,
+				`      <unknown>         -> ""`,
 			))
 			Expect(logs).To(ContainLines(
-				fmt.Sprintf(`    Selected Pipenv version (using BP_PIPENV_VERSION): %s`, buildpackInfo.Metadata.Dependencies[1].Version),
+				`    Selected Pipenv version (using BP_PIPENV_VERSION): 2022.7.4`,
 			))
 			Expect(logs).To(ContainLines(
 				"  Executing build process",

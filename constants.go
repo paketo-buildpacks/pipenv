@@ -1,11 +1,14 @@
 package pipenv
 
 const (
-	Pipenv           = "pipenv"
-	PipFileLock      = "Pipfile.lock"
-	DependencySHAKey = "dependency_sha"
-	CPython          = "cpython"
-	Pip              = "pip"
+	Pipenv          = "pipenv"
+	PipenvVersion   = "pipenv-version"
+	CPython         = "cpython"
+	Pip             = "pip"
+	DefaultVersions = "default-versions"
 )
 
-var Priorities = []interface{}{"BP_PIPENV_VERSION"}
+var Priorities = []interface{}{
+	"BP_PIPENV_VERSION",
+	DefaultVersions,
+}

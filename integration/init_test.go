@@ -22,9 +22,9 @@ var buildpackInfo struct {
 		Name string
 	}
 	Metadata struct {
-		Dependencies []struct {
-			Version string
-		}
+		DefaultVersions struct {
+			Pipenv string `toml:"pipenv"`
+		} `toml:"default-versions"`
 	}
 }
 
@@ -90,6 +90,5 @@ func TestIntegration(t *testing.T) {
 	suite := spec.New("Integration", spec.Report(report.Terminal{}))
 	suite("Default", testDefault, spec.Parallel())
 	suite("LayerReuse", testLayerReuse, spec.Parallel())
-	suite("Version", testVersions, spec.Parallel())
 	suite.Run(t)
 }
