@@ -22,7 +22,7 @@ api = "0.7"
     sha256 = "4c4c5a71cbfc38943e08629c20f62532382cda64960a81be7fd31adb584b0f2a"
     source = "https://files.pythonhosted.org/packages/a2/d1/50890e2d3b018230cecf3e0d2597b6cc2d535f6a8b84bf3f9981e42ad989/pipenv-2022.7.4.tar.gz"
     source_sha256 = "18420fbae2851d2b9d70d1e00f77a8c55d09704a177fe872a0a2da56e98eb018"
-    stacks = ["io.buildpacks.stacks.bionic"]
+    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
     uri = "https://deps.paketo.io/pipenv/pipenv_2022.7.4_linux_noarch_bionic_4c4c5a71.tgz"
     version = "2022.7.4"
 
