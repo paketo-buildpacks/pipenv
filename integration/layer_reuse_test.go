@@ -39,6 +39,9 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 
 		imageIDs = map[string]struct{}{}
 		containerIDs = map[string]struct{}{}
+
+		source, err = occam.Source(filepath.Join("testdata", "default_app"))
+		Expect(err).ToNot(HaveOccurred())
 	})
 
 	it.After(func() {
@@ -58,18 +61,14 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 	context("when the app is rebuilt and the same pipenv version is required", func() {
 		it("reuses the cached pipenv layer", func() {
 			var (
-				err    error
-				logs   fmt.Stringer
-				source string
+				err  error
+				logs fmt.Stringer
 
 				firstImage  occam.Image
 				secondImage occam.Image
 
 				secondContainer occam.Container
 			)
-
-			source, err = occam.Source(filepath.Join("testdata", "default_app"))
-			Expect(err).ToNot(HaveOccurred())
 
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
@@ -122,18 +121,14 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 	context("when the app is rebuilt and a different pipenv version is required", func() {
 		it("rebuilds", func() {
 			var (
-				err    error
-				logs   fmt.Stringer
-				source string
+				err  error
+				logs fmt.Stringer
 
 				firstImage  occam.Image
 				secondImage occam.Image
 
 				secondContainer occam.Container
 			)
-
-			source, err = occam.Source(filepath.Join("testdata", "default_app"))
-			Expect(err).ToNot(HaveOccurred())
 
 			firstImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
