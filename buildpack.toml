@@ -2,7 +2,7 @@ api = "0.7"
 
 [buildpack]
   id = "paketo-buildpacks/pipenv"
-  name = "Paketo Pipenv Buildpack"
+  name = "Paketo Buildpack for Pipenv"
   sbom-formats = ["application/vnd.cyclonedx+json", "application/spdx+json", "application/vnd.syft+json"]
 
   [[buildpack.licenses]]

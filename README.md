@@ -1,5 +1,5 @@
 # Pipenv Cloud Native Buildpack
-The Paketo Pipenv Buildpack is a Cloud Native Buildpack that installs
+The Paketo Buildpack for Pipenv is a Cloud Native Buildpack that installs
 [pipenv](https://pypi.org/project/pipenv) into a layer and makes it available
 on the `PATH`.
 
