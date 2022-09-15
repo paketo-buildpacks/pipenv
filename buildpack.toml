@@ -22,7 +22,7 @@ api = "0.7"
     sha256 = "bb33e7c88171d7ad9e864b6d4d82e4e306cd71aea135f05522841eff8aec1df7"
     source = "https://files.pythonhosted.org/packages/47/f4/fc774e32fb48febd5297141bd85081dc55d36da69937fcc9abb168c8ffe2/pipenv-2022.9.4.tar.gz"
     source_sha256 = "923a1c06ff70b1486ad6e7bd8279dfb3c599f560b0e392e5b7a98dfafa97115f"
-    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
+    stacks = ["*"]
     uri = "https://deps.paketo.io/pipenv/pipenv_2022.9.4_linux_noarch_bionic_bb33e7c8.tgz"
     version = "2022.9.4"
 
@@ -35,7 +35,7 @@ api = "0.7"
     sha256 = "ef4352e651505fdfe56f72ff03656c0896ef45bf127e06df0bff1b1a94f9cf65"
     source = "https://files.pythonhosted.org/packages/c3/42/7a3162ec0e17b4258528853d50639c77e511c78d3541a5d60d49314758c6/pipenv-2022.9.8.tar.gz"
     source_sha256 = "b6dfff06dea56e3bade92fc267c2da1f0807c5c7b0903eef6115fdb899c2b4b6"
-    stacks = ["io.buildpacks.stacks.bionic", "io.buildpacks.stacks.jammy"]
+    stacks = ["*"]
     uri = "https://deps.paketo.io/pipenv/pipenv_2022.9.8_linux_noarch_bionic_ef4352e6.tgz"
     version = "2022.9.8"
 
@@ -45,10 +45,4 @@ api = "0.7"
     patches = 2
 
 [[stacks]]
-  id = "io.buildpacks.stacks.bionic"
-
-[[stacks]]
-  id = "io.buildpacks.stacks.jammy"
-
-[[stacks]]
-  id = "org.cloudfoundry.stacks.cflinuxfs3"
+  id = "*"
