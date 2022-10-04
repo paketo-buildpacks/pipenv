@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.2.0
 	github.com/onsi/gomega v1.20.2
 	github.com/paketo-buildpacks/occam v0.13.2
-	github.com/paketo-buildpacks/packit/v2 v2.6.0
+	github.com/paketo-buildpacks/packit/v2 v2.6.1
 	github.com/sclevine/spec v1.4.0
 )
 
@@ -24,8 +24,8 @@ require (
 	github.com/anchore/go-macholibre v0.0.0-20220308212642-53e6d0aaf6fb // indirect
 	github.com/anchore/go-version v1.2.2-0.20200701162849-18adb9c92b9b // indirect
 	github.com/anchore/packageurl-go v0.1.1-0.20220428202044-a072fa3cb6d7 // indirect
-	github.com/anchore/stereoscope v0.0.0-20220829182958-659c89aa659f // indirect
-	github.com/anchore/syft v0.57.0 // indirect
+	github.com/anchore/stereoscope v0.0.0-20220921141924-56552770e555 // indirect
+	github.com/anchore/syft v0.58.0 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.2.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
@@ -105,7 +105,7 @@ require (
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
 	golang.org/x/sys v0.0.0-20220907062415-87db552b00fd // indirect
 	golang.org/x/text v0.3.8-0.20211004125949-5bd84dd9b33b // indirect
