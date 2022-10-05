@@ -1,18 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"time"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/joshuatcasey/libdependency/retrieve"
+	"github.com/joshuatcasey/libdependency/upstream"
 	"github.com/joshuatcasey/libdependency/versionology"
 	"github.com/paketo-buildpacks/packit/v2/cargo"
-	"github.com/paketo-buildpacks/packit/v2/vacation"
 )
 
 type PyPiProductMetadataRaw struct {
@@ -36,25 +33,10 @@ func (release PipenvRelease) Version() *semver.Version {
 }
 
 func getAllVersions() (versionology.VersionFetcherArray, error) {
-	response, err := http.DefaultClient.Get("https://pypi.org/pypi/pipenv/json")
-	if err != nil {
-		return nil, fmt.Errorf("could not get project metadata: %w", err)
-	}
-
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	body, err := io.ReadAll(response.Body)
-	if err != nil {
-		return nil, fmt.Errorf("could not read response: %w", err)
-	}
-
 	var pipenvMetadata PyPiProductMetadataRaw
-	err = json.Unmarshal(body, &pipenvMetadata)
+	err := upstream.GetAndUnmarshal("https://pypi.org/pypi/pipenv/json", &pipenvMetadata)
 	if err != nil {
-		return nil, fmt.Errorf("could not unmarshal project metadata: %w", err)
+		return nil, fmt.Errorf("could not retrieve new versions from upstream: %w", err)
 	}
 
 	var allVersions versionology.VersionFetcherArray
@@ -100,7 +82,7 @@ func generateMetadata(versionFetcher versionology.VersionFetcher) ([]versionolog
 		CPE:            fmt.Sprintf("cpe:2.3:a:python-pipenv:pipenv:%s:*:*:*:*:python:*:*", version),
 		Checksum:       fmt.Sprintf("sha256:%s", pipenvRelease.SourceSHA256),
 		ID:             "pipenv",
-		Licenses:       retrieve.LookupLicenses(pipenvRelease.SourceURL, defaultDecompress),
+		Licenses:       retrieve.LookupLicenses(pipenvRelease.SourceURL, upstream.DefaultDecompress),
 		Name:           "Pipenv",
 		PURL:           retrieve.GeneratePURL("pipenv", version, pipenvRelease.SourceSHA256, pipenvRelease.SourceURL),
 		Source:         pipenvRelease.SourceURL,
@@ -118,15 +100,4 @@ func generateMetadata(versionFetcher versionology.VersionFetcher) ([]versionolog
 
 func main() {
 	retrieve.NewMetadata("pipenv", getAllVersions, generateMetadata)
-}
-
-func defaultDecompress(artifact io.Reader, destination string) error {
-	archive := vacation.NewArchive(artifact)
-
-	err := archive.StripComponents(1).Decompress(destination)
-	if err != nil {
-		return fmt.Errorf("failed to decompress source file: %w", err)
-	}
-
-	return nil
 }
