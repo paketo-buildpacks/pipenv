@@ -223,6 +223,23 @@ jobs:
           name: "metadata.json"
           path: "metadata.json"
 
+  checking:
+    name: checking on the workflow
+    needs:
+      - retrieve
+      - compile
+      - update-metadata
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print outputs
+        run: |
+          echo retrieve.status=${{ needs.retrieve.result }}
+          echo compile.status=${{ needs.compile.result }}
+          echo update-metadata.status=${{ needs.update-metadata.result }}
+          echo "metadata json"
+          echo "${{ fromJSON(needs.retrieve.outputs.metadata-json) }}"
+
   assemble:
     name: Update buildpack.toml
     needs:
