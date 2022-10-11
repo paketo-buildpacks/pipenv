@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/joshuatcasey/collections"
 	"github.com/paketo-buildpacks/occam"
 	"github.com/sclevine/spec"
 
@@ -22,8 +23,8 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 		pack   occam.Pack
 		docker occam.Docker
 
-		imageIDs     map[string]struct{}
-		containerIDs map[string]struct{}
+		imageIDs     *collections.Set[string]
+		containerIDs *collections.Set[string]
 
 		name   string
 		source string
@@ -37,24 +38,23 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 		pack = occam.NewPack()
 		docker = occam.NewDocker()
 
-		imageIDs = map[string]struct{}{}
-		containerIDs = map[string]struct{}{}
+		imageIDs = collections.NewSet()
+		containerIDs = collections.NewSet()
 
 		source, err = occam.Source(filepath.Join("testdata", "default_app"))
 		Expect(err).ToNot(HaveOccurred())
 	})
 
 	it.After(func() {
-		for id := range containerIDs {
+		containerIDs.ForEach(func(id string) {
 			Expect(docker.Container.Remove.Execute(id)).To(Succeed())
-		}
+		})
 
-		for id := range imageIDs {
+		imageIDs.ForEach(func(id string) {
 			Expect(docker.Image.Remove.Execute(id)).To(Succeed())
-		}
+		})
 
 		Expect(docker.Volume.Remove.Execute(occam.CacheVolumeNames(name))).To(Succeed())
-
 		Expect(os.RemoveAll(source)).To(Succeed())
 	})
 
@@ -81,7 +81,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
-			imageIDs[firstImage.ID] = struct{}{}
+			imageIDs.Add(firstImage.ID)
 
 			secondImage, logs, err = pack.WithNoColor().Build.
 				WithPullPolicy("never").
@@ -94,7 +94,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
-			imageIDs[secondImage.ID] = struct{}{}
+			imageIDs.Add(secondImage.ID)
 
 			Expect(logs).To(ContainLines(
 				fmt.Sprintf("  Reusing cached layer /layers/%s/pipenv", strings.ReplaceAll(buildpackInfo.Buildpack.ID, "/", "_")),
@@ -105,7 +105,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				Execute(secondImage.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			containerIDs[secondContainer.ID] = struct{}{}
+			containerIDs.Add(secondContainer.ID)
 
 			Eventually(func() string {
 				cLogs, err := docker.Container.Logs.Execute(secondContainer.ID)
@@ -154,14 +154,14 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				Execute(name, source)
 			Expect(err).ToNot(HaveOccurred(), logs.String)
 
-			imageIDs[secondImage.ID] = struct{}{}
+			imageIDs.Add(secondImage.ID)
 
 			Expect(logs).To(ContainLines(
 				MatchRegexp(fmt.Sprintf(`%s \d+\.\d+\.\d+`, buildpackInfo.Buildpack.Name)),
 				"  Resolving Pipenv version",
 				"    Candidate version sources (in priority order):",
 				MatchRegexp(`      BP_PIPENV_VERSION -> "\d+\.\d+\.\d+"`),
-				"      <unknown>         -> \"\"",
+				`      <unknown>         -> ""`,
 			))
 			Expect(logs).To(ContainLines(
 				fmt.Sprintf(`    Selected Pipenv version (using BP_PIPENV_VERSION): %s`, buildpackInfo.Metadata.Dependencies[1].Version),
@@ -184,7 +184,7 @@ func testLayerReuse(t *testing.T, context spec.G, it spec.S) {
 				Execute(secondImage.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			containerIDs[secondContainer.ID] = struct{}{}
+			containerIDs.Add(secondContainer.ID)
 
 			Eventually(func() string {
 				cLogs, err := docker.Container.Logs.Execute(secondContainer.ID)

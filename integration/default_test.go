@@ -71,7 +71,7 @@ func testDefault(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(fmt.Sprintf(`%s \d+\.\d+\.\d+`, buildpackInfo.Buildpack.Name)),
 				"  Resolving Pipenv version",
 				"    Candidate version sources (in priority order):",
-				"      <unknown> -> \"\"",
+				`      <unknown> -> ""`,
 			))
 			Expect(logs).To(ContainLines(
 				MatchRegexp(`    Selected Pipenv version \(using <unknown>\): \d+\.\d+\.\d+`),
