@@ -44,12 +44,8 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		var err error
-		layersDir, err = os.MkdirTemp("", "layers")
-		Expect(err).NotTo(HaveOccurred())
-
-		cnbDir, err = os.MkdirTemp("", "cnb")
-		Expect(err).NotTo(HaveOccurred())
+		layersDir = t.TempDir()
+		cnbDir = t.TempDir()
 
 		dependencyManager = &fakes.DependencyManager{}
 		dependencyManager.ResolveCall.Returns.Dependency = postal.Dependency{
@@ -115,11 +111,6 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Layers:   packit.Layers{Path: layersDir},
 			Stack:    "some-stack",
 		}
-	})
-
-	it.After(func() {
-		Expect(os.RemoveAll(layersDir)).To(Succeed())
-		Expect(os.RemoveAll(cnbDir)).To(Succeed())
 	})
 
 	it("returns a result that installs pipenv", func() {
