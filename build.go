@@ -91,8 +91,8 @@ func Build(
 			return packit.BuildResult{}, err
 		}
 
-		cachedSHA, ok := pipenvLayer.Metadata[DependencySHAKey].(string)
-		if ok && cachedSHA == dependency.SHA256 {
+		cachedChecksum, ok := pipenvLayer.Metadata[DependencyChecksumKey].(string)
+		if ok && cachedChecksum == dependency.Checksum {
 			logger.Process("Reusing cached layer %s", pipenvLayer.Path)
 			pipenvLayer.Launch, pipenvLayer.Build, pipenvLayer.Cache = launch, build, build
 
@@ -144,7 +144,7 @@ func Build(
 		}
 
 		pipenvLayer.Metadata = map[string]interface{}{
-			DependencySHAKey: dependency.SHA256,
+			DependencyChecksumKey: dependency.Checksum,
 		}
 
 		// Look up the site packages path and prepend it onto $PYTHONPATH
