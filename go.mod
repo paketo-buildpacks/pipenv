@@ -1,6 +1,6 @@
 module github.com/paketo-buildpacks/pipenv
 
-go 1.18
+go 1.19
 
 // This is required because of a breaking change in a newer version
 replace github.com/CycloneDX/cyclonedx-go => github.com/CycloneDX/cyclonedx-go v0.6.0
