@@ -26,9 +26,7 @@ func testSiteProcess(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		var err error
-		targetLayerPath, err = os.MkdirTemp("", "pipenv")
-		Expect(err).NotTo(HaveOccurred())
+		targetLayerPath = t.TempDir()
 
 		executable = &fakes.Executable{}
 		executable.ExecuteCall.Stub = func(execution pexec.Execution) error {
@@ -39,10 +37,6 @@ func testSiteProcess(t *testing.T, context spec.G, it spec.S) {
 		}
 
 		siteProcess = pipenv.NewSiteProcess(executable)
-	})
-
-	it.After(func() {
-		Expect(os.RemoveAll(targetLayerPath)).To(Succeed())
 	})
 
 	context("Execute", func() {

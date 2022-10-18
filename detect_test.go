@@ -21,11 +21,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		var err error
-		workingDir, err = os.MkdirTemp("", "working-dir")
-		Expect(err).NotTo(HaveOccurred())
+		workingDir = t.TempDir()
 
-		err = os.WriteFile(filepath.Join(workingDir, "Pipfile"), []byte{}, 0644)
+		err := os.WriteFile(filepath.Join(workingDir, "Pipfile"), []byte{}, 0644)
 		Expect(err).NotTo(HaveOccurred())
 
 		detect = pipenv.Detect()
@@ -63,12 +61,9 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 	context("when BP_PIPENV_VERSION is set", func() {
 		it.Before(func() {
-			os.Setenv("BP_PIPENV_VERSION", "1.2.3")
+			t.Setenv("BP_PIPENV_VERSION", "1.2.3")
 		})
 
-		it.After(func() {
-			_ = os.Unsetenv("BP_PIPENV_VERSION")
-		})
 		it("returns a plan that provides a specific pipenv version", func() {
 			result, err := detect(packit.DetectContext{
 				WorkingDir: workingDir,

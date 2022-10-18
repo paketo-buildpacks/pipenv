@@ -18,7 +18,7 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
-		version       string
+		version       = "1.2.3-some.version"
 		destLayerPath string
 		executable    *fakes.Executable
 
@@ -26,11 +26,7 @@ func testPipenvInstallProcess(t *testing.T, context spec.G, it spec.S) {
 	)
 
 	it.Before(func() {
-		var err error
-		destLayerPath, err = os.MkdirTemp("", "pipenv")
-		Expect(err).NotTo(HaveOccurred())
-
-		version = "1.2.3-some.version"
+		destLayerPath = t.TempDir()
 
 		executable = &fakes.Executable{}
 

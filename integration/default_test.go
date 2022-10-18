@@ -71,7 +71,7 @@ func testDefault(t *testing.T, context spec.G, it spec.S) {
 				MatchRegexp(fmt.Sprintf(`%s \d+\.\d+\.\d+`, buildpackInfo.Buildpack.Name)),
 				"  Resolving Pipenv version",
 				"    Candidate version sources (in priority order):",
-				"      <unknown> -> \"\"",
+				`      <unknown> -> ""`,
 			))
 			Expect(logs).To(ContainLines(
 				MatchRegexp(`    Selected Pipenv version \(using <unknown>\): \d+\.\d+\.\d+`),
@@ -108,15 +108,12 @@ func testDefault(t *testing.T, context spec.G, it spec.S) {
 			)
 
 			it.Before(func() {
-				var err error
-				sbomDir, err = os.MkdirTemp("", "sbom")
-				Expect(err).NotTo(HaveOccurred())
+				sbomDir = t.TempDir()
 				Expect(os.Chmod(sbomDir, os.ModePerm)).To(Succeed())
 			})
 
 			it.After(func() {
 				Expect(docker.Container.Remove.Execute(container2.ID)).To(Succeed())
-				Expect(os.RemoveAll(sbomDir)).To(Succeed())
 			})
 
 			it("writes SBOM files to the layer and label metadata", func() {
