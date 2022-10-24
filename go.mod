@@ -6,7 +6,7 @@ go 1.19
 replace github.com/CycloneDX/cyclonedx-go => github.com/CycloneDX/cyclonedx-go v0.6.0
 
 require (
-	github.com/BurntSushi/toml v1.2.0
+	github.com/BurntSushi/toml v1.2.1
 	github.com/joshuatcasey/collections v0.5.0
 	github.com/onsi/gomega v1.22.1
 	github.com/paketo-buildpacks/occam v0.13.3
