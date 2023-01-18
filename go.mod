@@ -2,8 +2,6 @@ module github.com/paketo-buildpacks/pipenv
 
 go 1.19
 
-// This is required because of a breaking change in a newer version
-
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/joshuatcasey/collections v0.5.0
