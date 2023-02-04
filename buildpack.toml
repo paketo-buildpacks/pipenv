@@ -14,19 +14,6 @@ api = "0.7"
   pre-package = "./scripts/build.sh"
 
   [[metadata.dependencies]]
-    checksum = "sha256:7fdeca8c2feb143e46bd5f50a45643e274c0813c3471f845a1cfb301f96aab4e"
-    cpe = "cpe:2.3:a:python-pipenv:pipenv:2022.12.17:*:*:*:*:python:*:*"
-    id = "pipenv"
-    licenses = ["MIT", "MIT-0"]
-    name = "Pipenv"
-    purl = "pkg:generic/pipenv@2022.12.17?checksum=7fdeca8c2feb143e46bd5f50a45643e274c0813c3471f845a1cfb301f96aab4e&download_url=https://files.pythonhosted.org/packages/08/d4/e0e9610e6250714093ef2ce98a25090ec30b954b96f68618c5e4b405dcfb/pipenv-2022.12.17.tar.gz"
-    source = "https://files.pythonhosted.org/packages/08/d4/e0e9610e6250714093ef2ce98a25090ec30b954b96f68618c5e4b405dcfb/pipenv-2022.12.17.tar.gz"
-    source-checksum = "sha256:7fdeca8c2feb143e46bd5f50a45643e274c0813c3471f845a1cfb301f96aab4e"
-    stacks = ["*"]
-    uri = "https://files.pythonhosted.org/packages/08/d4/e0e9610e6250714093ef2ce98a25090ec30b954b96f68618c5e4b405dcfb/pipenv-2022.12.17.tar.gz"
-    version = "2022.12.17"
-
-  [[metadata.dependencies]]
     checksum = "sha256:56a0e9305912293a8205e23b836b4abb9bca912fd5ef131214cdcdbc1861a1cc"
     cpe = "cpe:2.3:a:python-pipenv:pipenv:2022.12.19:*:*:*:*:python:*:*"
     id = "pipenv"
@@ -38,6 +25,19 @@ api = "0.7"
     stacks = ["*"]
     uri = "https://files.pythonhosted.org/packages/0a/f8/88e192449fc806dece1f3fe631e7a1dc06c01e8cfaa3bd1fb0e8e7ee6639/pipenv-2022.12.19.tar.gz"
     version = "2022.12.19"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:18a3eba519e36d59f0d5a7f9c42bd268521e4b9b7b3d1bd6adcf131569323275"
+    cpe = "cpe:2.3:a:python-pipenv:pipenv:2023.2.4:*:*:*:*:python:*:*"
+    id = "pipenv"
+    licenses = ["MIT", "MIT-0"]
+    name = "Pipenv"
+    purl = "pkg:generic/pipenv@2023.2.4?checksum=18a3eba519e36d59f0d5a7f9c42bd268521e4b9b7b3d1bd6adcf131569323275&download_url=https://files.pythonhosted.org/packages/7e/19/98c841512d64c54d4ad47409a18e8ca763847c24aed0b6a1158ad3bf8cfb/pipenv-2023.2.4.tar.gz"
+    source = "https://files.pythonhosted.org/packages/7e/19/98c841512d64c54d4ad47409a18e8ca763847c24aed0b6a1158ad3bf8cfb/pipenv-2023.2.4.tar.gz"
+    source-checksum = "sha256:18a3eba519e36d59f0d5a7f9c42bd268521e4b9b7b3d1bd6adcf131569323275"
+    stacks = ["*"]
+    uri = "https://files.pythonhosted.org/packages/7e/19/98c841512d64c54d4ad47409a18e8ca763847c24aed0b6a1158ad3bf8cfb/pipenv-2023.2.4.tar.gz"
+    version = "2023.2.4"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
