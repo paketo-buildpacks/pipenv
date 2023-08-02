@@ -14,30 +14,30 @@ api = "0.7"
   pre-package = "./scripts/build.sh"
 
   [[metadata.dependencies]]
-    checksum = "sha256:404de9ff6a2464e20e52aaad71db2d4f8f2900f2177fc45a47f6315686cb2e5b"
-    cpe = "cpe:2.3:a:python-pipenv:pipenv:2023.7.3:*:*:*:*:python:*:*"
+    checksum = "sha256:4089056c0e859307cd6b86223002657b55953f78d9af1b848f8953cdb94cfa12"
+    cpe = "cpe:2.3:a:python-pipenv:pipenv:2023.7.11:*:*:*:*:python:*:*"
     id = "pipenv"
     licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
-    purl = "pkg:generic/pipenv@2023.7.3?checksum=404de9ff6a2464e20e52aaad71db2d4f8f2900f2177fc45a47f6315686cb2e5b&download_url=https://files.pythonhosted.org/packages/92/fa/33d1212dc510d88c9e402cd84ef80485af1ffe88b317da55d0dae375f6c2/pipenv-2023.7.3.tar.gz"
-    source = "https://files.pythonhosted.org/packages/92/fa/33d1212dc510d88c9e402cd84ef80485af1ffe88b317da55d0dae375f6c2/pipenv-2023.7.3.tar.gz"
-    source-checksum = "sha256:404de9ff6a2464e20e52aaad71db2d4f8f2900f2177fc45a47f6315686cb2e5b"
+    purl = "pkg:generic/pipenv@2023.7.11?checksum=4089056c0e859307cd6b86223002657b55953f78d9af1b848f8953cdb94cfa12&download_url=https://files.pythonhosted.org/packages/96/fc/5323ede9132b2b60daca1a6e5bcb85a4ec42b647b5a63481581f8e93865a/pipenv-2023.7.11.tar.gz"
+    source = "https://files.pythonhosted.org/packages/96/fc/5323ede9132b2b60daca1a6e5bcb85a4ec42b647b5a63481581f8e93865a/pipenv-2023.7.11.tar.gz"
+    source-checksum = "sha256:4089056c0e859307cd6b86223002657b55953f78d9af1b848f8953cdb94cfa12"
     stacks = ["*"]
-    uri = "https://files.pythonhosted.org/packages/92/fa/33d1212dc510d88c9e402cd84ef80485af1ffe88b317da55d0dae375f6c2/pipenv-2023.7.3.tar.gz"
-    version = "2023.7.3"
+    uri = "https://files.pythonhosted.org/packages/96/fc/5323ede9132b2b60daca1a6e5bcb85a4ec42b647b5a63481581f8e93865a/pipenv-2023.7.11.tar.gz"
+    version = "2023.7.11"
 
   [[metadata.dependencies]]
-    checksum = "sha256:c737bf9da865036b87e53334872934907f1bf72d336f9b84eabd1297c6e3326e"
-    cpe = "cpe:2.3:a:python-pipenv:pipenv:2023.7.4:*:*:*:*:python:*:*"
+    checksum = "sha256:77b1ba91d3cbfa85acb05fb447f5c8ab452dc377e0aea0f3ded8b2c36b669a45"
+    cpe = "cpe:2.3:a:python-pipenv:pipenv:2023.7.23:*:*:*:*:python:*:*"
     id = "pipenv"
     licenses = ["MIT", "MIT-0"]
     name = "Pipenv"
-    purl = "pkg:generic/pipenv@2023.7.4?checksum=c737bf9da865036b87e53334872934907f1bf72d336f9b84eabd1297c6e3326e&download_url=https://files.pythonhosted.org/packages/90/5c/6a8d7074829d3bfe9496ea211625b4fcaf0a1f8a61ce72eacd87a0833a5d/pipenv-2023.7.4.tar.gz"
-    source = "https://files.pythonhosted.org/packages/90/5c/6a8d7074829d3bfe9496ea211625b4fcaf0a1f8a61ce72eacd87a0833a5d/pipenv-2023.7.4.tar.gz"
-    source-checksum = "sha256:c737bf9da865036b87e53334872934907f1bf72d336f9b84eabd1297c6e3326e"
+    purl = "pkg:generic/pipenv@2023.7.23?checksum=77b1ba91d3cbfa85acb05fb447f5c8ab452dc377e0aea0f3ded8b2c36b669a45&download_url=https://files.pythonhosted.org/packages/6f/7f/389e0d3839c53a7ab5e99fe0dcd0dbd8c4ea269acf95861fb7cb2ca2ef1a/pipenv-2023.7.23.tar.gz"
+    source = "https://files.pythonhosted.org/packages/6f/7f/389e0d3839c53a7ab5e99fe0dcd0dbd8c4ea269acf95861fb7cb2ca2ef1a/pipenv-2023.7.23.tar.gz"
+    source-checksum = "sha256:77b1ba91d3cbfa85acb05fb447f5c8ab452dc377e0aea0f3ded8b2c36b669a45"
     stacks = ["*"]
-    uri = "https://files.pythonhosted.org/packages/90/5c/6a8d7074829d3bfe9496ea211625b4fcaf0a1f8a61ce72eacd87a0833a5d/pipenv-2023.7.4.tar.gz"
-    version = "2023.7.4"
+    uri = "https://files.pythonhosted.org/packages/6f/7f/389e0d3839c53a7ab5e99fe0dcd0dbd8c4ea269acf95861fb7cb2ca2ef1a/pipenv-2023.7.23.tar.gz"
+    version = "2023.7.23"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
