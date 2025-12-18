@@ -14,19 +14,6 @@ api = "0.7"
   pre-package = "./scripts/build.sh --target linux/amd64 --target linux/arm64"
 
   [[metadata.dependencies]]
-    checksum = "sha256:93d5eade9f92d1510c76a2038775b823d098b5e00bd0752b032f4cae0f661287"
-    cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.0.1:*:*:*:*:python:*:*"
-    id = "pipenv"
-    licenses = ["MIT", "MIT-0"]
-    name = "Pipenv"
-    purl = "pkg:generic/pipenv@2026.0.1?checksum=93d5eade9f92d1510c76a2038775b823d098b5e00bd0752b032f4cae0f661287&download_url=https://files.pythonhosted.org/packages/a8/fe/ff0dd4c87ca5afd2c3eccafd1317ff058ee18cf0a9abce3a7f5428fbc935/pipenv-2026.0.1.tar.gz"
-    source = "https://files.pythonhosted.org/packages/a8/fe/ff0dd4c87ca5afd2c3eccafd1317ff058ee18cf0a9abce3a7f5428fbc935/pipenv-2026.0.1.tar.gz"
-    source-checksum = "sha256:93d5eade9f92d1510c76a2038775b823d098b5e00bd0752b032f4cae0f661287"
-    stacks = ["*"]
-    uri = "https://files.pythonhosted.org/packages/a8/fe/ff0dd4c87ca5afd2c3eccafd1317ff058ee18cf0a9abce3a7f5428fbc935/pipenv-2026.0.1.tar.gz"
-    version = "2026.0.1"
-
-  [[metadata.dependencies]]
     checksum = "sha256:19aa881e98513852c5133ac5a2d898d2546654d062f7f524ed8e0f8f222c98b5"
     cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.0.2:*:*:*:*:python:*:*"
     id = "pipenv"
@@ -38,6 +25,19 @@ api = "0.7"
     stacks = ["*"]
     uri = "https://files.pythonhosted.org/packages/d8/6c/41efe0b9417023d460049c881aae5860f37a0018b52dcd4d954bc5a57ea2/pipenv-2026.0.2.tar.gz"
     version = "2026.0.2"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:9a39d13a41ed8e4368ad50620941191f357319c8ffb7df45875c7c5dc6604ff6"
+    cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.0.3:*:*:*:*:python:*:*"
+    id = "pipenv"
+    licenses = ["MIT", "MIT-0"]
+    name = "Pipenv"
+    purl = "pkg:generic/pipenv@2026.0.3?checksum=9a39d13a41ed8e4368ad50620941191f357319c8ffb7df45875c7c5dc6604ff6&download_url=https://files.pythonhosted.org/packages/90/03/8958464e0d366530477f07fd041ef6b9df56f3ea9c56d0db24cc8cd87fff/pipenv-2026.0.3.tar.gz"
+    source = "https://files.pythonhosted.org/packages/90/03/8958464e0d366530477f07fd041ef6b9df56f3ea9c56d0db24cc8cd87fff/pipenv-2026.0.3.tar.gz"
+    source-checksum = "sha256:9a39d13a41ed8e4368ad50620941191f357319c8ffb7df45875c7c5dc6604ff6"
+    stacks = ["*"]
+    uri = "https://files.pythonhosted.org/packages/90/03/8958464e0d366530477f07fd041ef6b9df56f3ea9c56d0db24cc8cd87fff/pipenv-2026.0.3.tar.gz"
+    version = "2026.0.3"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
