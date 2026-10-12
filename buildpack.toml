@@ -14,30 +14,30 @@ api = "0.7"
   pre-package = "./scripts/build.sh --target linux/amd64 --target linux/arm64"
 
   [[metadata.dependencies]]
-    checksum = "sha256:29b9450d52eff3570b28f35d30586cccca68e89a579b92ce4f0b6b59aef30214"
-    cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.7.1:*:*:*:*:python:*:*"
-    id = "pipenv"
-    licenses = ["MIT", "MIT-0"]
-    name = "Pipenv"
-    purl = "pkg:generic/pipenv@2026.7.1?checksum=29b9450d52eff3570b28f35d30586cccca68e89a579b92ce4f0b6b59aef30214&download_url=https://files.pythonhosted.org/packages/e8/af/aebabe333f35f71220a860fb1f6de5ccd7942c4029ae09fce7aada5f9644/pipenv-2026.7.1.tar.gz"
-    source = "https://files.pythonhosted.org/packages/e8/af/aebabe333f35f71220a860fb1f6de5ccd7942c4029ae09fce7aada5f9644/pipenv-2026.7.1.tar.gz"
-    source-checksum = "sha256:29b9450d52eff3570b28f35d30586cccca68e89a579b92ce4f0b6b59aef30214"
-    stacks = ["*"]
-    uri = "https://files.pythonhosted.org/packages/e8/af/aebabe333f35f71220a860fb1f6de5ccd7942c4029ae09fce7aada5f9644/pipenv-2026.7.1.tar.gz"
-    version = "2026.7.1"
-
-  [[metadata.dependencies]]
-    checksum = "sha256:ff0e3d61bfdb3d19ea1d912dfdfd62c9e5521fcc63e525de6a63818db8b4451f"
-    cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.8.0:*:*:*:*:python:*:*"
+    checksum = "sha256:7df4cfe029225de234071a65888c80d2b92f6c04e01923ab8d4bf0112af3509b"
+    cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.9.0:*:*:*:*:python:*:*"
     id = "pipenv"
     licenses = ["JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh"]
     name = "Pipenv"
-    purl = "pkg:generic/pipenv@2026.8.0?checksum=ff0e3d61bfdb3d19ea1d912dfdfd62c9e5521fcc63e525de6a63818db8b4451f&download_url=https://files.pythonhosted.org/packages/b3/61/7f1d28d168eeaeed21eef4f117d482be061e277e890bc26fbfcdaa97c2f7/pipenv-2026.8.0.tar.gz"
-    source = "https://files.pythonhosted.org/packages/b3/61/7f1d28d168eeaeed21eef4f117d482be061e277e890bc26fbfcdaa97c2f7/pipenv-2026.8.0.tar.gz"
-    source-checksum = "sha256:ff0e3d61bfdb3d19ea1d912dfdfd62c9e5521fcc63e525de6a63818db8b4451f"
+    purl = "pkg:generic/pipenv@2026.9.0?checksum=7df4cfe029225de234071a65888c80d2b92f6c04e01923ab8d4bf0112af3509b&download_url=https://files.pythonhosted.org/packages/06/53/cf9059aa5173821dbdacebc43b90519c6d2bdabb8381c8fb562f2a9c70d5/pipenv-2026.9.0.tar.gz"
+    source = "https://files.pythonhosted.org/packages/06/53/cf9059aa5173821dbdacebc43b90519c6d2bdabb8381c8fb562f2a9c70d5/pipenv-2026.9.0.tar.gz"
+    source-checksum = "sha256:7df4cfe029225de234071a65888c80d2b92f6c04e01923ab8d4bf0112af3509b"
     stacks = ["*"]
-    uri = "https://files.pythonhosted.org/packages/b3/61/7f1d28d168eeaeed21eef4f117d482be061e277e890bc26fbfcdaa97c2f7/pipenv-2026.8.0.tar.gz"
-    version = "2026.8.0"
+    uri = "https://files.pythonhosted.org/packages/06/53/cf9059aa5173821dbdacebc43b90519c6d2bdabb8381c8fb562f2a9c70d5/pipenv-2026.9.0.tar.gz"
+    version = "2026.9.0"
+
+  [[metadata.dependencies]]
+    checksum = "sha256:d6a71b04b62b0000e6d87ee63aae47ea55cb43d9d08b2c04663e2740840a947c"
+    cpe = "cpe:2.3:a:python-pipenv:pipenv:2026.9.1:*:*:*:*:python:*:*"
+    id = "pipenv"
+    licenses = ["JSON", "MIT", "MIT-0", "MIT-advertising", "MIT-feh"]
+    name = "Pipenv"
+    purl = "pkg:generic/pipenv@2026.9.1?checksum=d6a71b04b62b0000e6d87ee63aae47ea55cb43d9d08b2c04663e2740840a947c&download_url=https://files.pythonhosted.org/packages/e8/1c/d96925a62b85f0bcaa4381c9a3efc47421f0c634a829f2839485909f0447/pipenv-2026.9.1.tar.gz"
+    source = "https://files.pythonhosted.org/packages/e8/1c/d96925a62b85f0bcaa4381c9a3efc47421f0c634a829f2839485909f0447/pipenv-2026.9.1.tar.gz"
+    source-checksum = "sha256:d6a71b04b62b0000e6d87ee63aae47ea55cb43d9d08b2c04663e2740840a947c"
+    stacks = ["*"]
+    uri = "https://files.pythonhosted.org/packages/e8/1c/d96925a62b85f0bcaa4381c9a3efc47421f0c634a829f2839485909f0447/pipenv-2026.9.1.tar.gz"
+    version = "2026.9.1"
 
   [[metadata.dependency-constraints]]
     constraint = "*"
